@@ -567,6 +567,7 @@ function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
 		end
 	end
 	
+	local lastValue
 	local Connection
 	Connection = runService.RenderStepped:Connect(function(Delta)
 		if CurrentTime < RenderInfo.Time and Render then
@@ -582,6 +583,13 @@ function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
 				end
 				
 				if Render and success then
+					if lastValue then
+						if Render[Index] ~= lastValue then
+							Connection:Disconnect()
+							return
+						end
+					end
+					
 					if typeof(Value) == "number" then
 						Render[Index] = (Value * TweenedValue) + Start[Index]
 					elseif typeof(Value) == "Vector2" then
@@ -589,6 +597,8 @@ function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
 					elseif typeof(Value) == "function" then
 						Render[Index] = Value(TweenedValue)
 					end
+					
+					lastValue = Render[Index]
 				else
 					Connection:Disconnect()
 				end
@@ -1317,7 +1327,10 @@ local function updateAmbient()
 		if not ambient.IsPlaying then
 			printconsole("new ambient playing",255,255,255)
 			lastTimePos.combat = combat.TimePosition
-			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = 0}, false)
+			local onEnd = function()
+				combat:Pause()
+			end
+			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = 0}, false, onEnd)
 			
 			shouldTween = true
 			ambient.TimePosition = lastTimePos.ambient
