@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.1'
+local ver = 'v0.3.2'
 
 local options = {
 	showMessagesNearName = true,
@@ -687,7 +687,6 @@ local function preloadAmbients()
 		end
 	end
 end
-preloadAmbients()
 
 local function isInDanger()
 	local statsGui = playerGui:WaitForChild("StatsGui",math.huge)
@@ -1316,10 +1315,8 @@ local function updateAmbient()
 	-- play - stop
 	if isCombat then
 		if not combat.IsPlaying then
-			printconsole("new combat playing",255,255,255)
 			lastTimePos.ambient = ambient.TimePosition
 			local onEnd = function()
-				printconsole("i ran",255,255,255)
 				ambient:Pause()
 			end
 			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = 0}, false, onEnd)
@@ -1331,10 +1328,8 @@ local function updateAmbient()
 		end
 	else
 		if not ambient.IsPlaying then
-			printconsole("new ambient playing",255,255,255)
 			lastTimePos.combat = combat.TimePosition
 			local onEnd = function()
-				printconsole("i ran",255,255,255)
 				combat:Pause()
 			end
 			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = 0}, false, onEnd)
@@ -1447,6 +1442,8 @@ end
 
 
 -- main
+preloadAmbients()
+
 shared.CV_PlayerAddedCon = players.PlayerAdded:Connect(playerAdded)
 shared.CV_PlayerRemovingCon = players.PlayerRemoving:Connect(playerRemoving)
 
