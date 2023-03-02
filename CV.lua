@@ -1269,7 +1269,6 @@ local function clearOldSound(sound)
 end
 
 local lastTimePos = {ambient = 0, combat = 0}
-local shouldTween = false
 local function updateAmbient()
 	local area = getAmbient()
 	if not area then
@@ -1282,6 +1281,7 @@ local function updateAmbient()
 	local isCombat = isInDanger()
 	
 	local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local shouldTween = false
 	
 	-- new
 	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
@@ -1316,7 +1316,10 @@ local function updateAmbient()
 		if not combat.IsPlaying then
 			printconsole("new combat playing",255,255,255)
 			lastTimePos.ambient = ambient.TimePosition
-			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = 0}, false)
+			local onEnd = function()
+				ambient:Pause()
+			end
+			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = 0}, false, onEnd)
 			
 			shouldTween = true
 			combat.TimePosition = lastTimePos.combat
