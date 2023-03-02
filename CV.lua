@@ -1292,6 +1292,7 @@ local function updateAmbient()
 		
 		local newAmbient = Instance.new("Sound")
 		newAmbient.Name = "Ambient"
+		newAmbient.Looped = true
 		newAmbient.Volume = 0
 		newAmbient.Parent = coreGui
 		newAmbient.SoundId = area.ambient.id
@@ -1305,6 +1306,7 @@ local function updateAmbient()
 		
 		local newCombat = Instance.new("Sound")
 		newCombat.Name = "Combat"
+		newCombat.Looped = true
 		newCombat.Volume = 0
 		newCombat.Parent = coreGui
 		newCombat.SoundId = area.combat.id
@@ -1317,6 +1319,7 @@ local function updateAmbient()
 			printconsole("new combat playing",255,255,255)
 			lastTimePos.ambient = ambient.TimePosition
 			local onEnd = function()
+				printconsole("i ran",255,255,255)
 				ambient:Pause()
 			end
 			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = 0}, false, onEnd)
@@ -1331,6 +1334,7 @@ local function updateAmbient()
 			printconsole("new ambient playing",255,255,255)
 			lastTimePos.combat = combat.TimePosition
 			local onEnd = function()
+				printconsole("i ran",255,255,255)
 				combat:Pause()
 			end
 			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = 0}, false, onEnd)
