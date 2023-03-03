@@ -9,9 +9,9 @@ if game.CreatorId ~= 5212858 then
 
 
 -- libs
-local Library = loadstring(game:HttpGet('https://gist.githubusercontent.com/flurinios-accorney/ab48b0a316294adcb235374031af4c50/raw/linoraui.lua', true)))()
-local ThemeManager = loadstring(game:HttpGet('https://gist.githubusercontent.com/flurinios-accorney/23cffd623d3d73bbc0d70a3204862b9a/raw/linorathememanager.lua', true)))()
-local SaveManager = loadstring(game:HttpGet('https://gist.githubusercontent.com/flurinios-accorney/c58d7836d55e6ae5ef1f62108c29bff8/raw/linorasavemanager.lua', true)))()
+local Library = loadstring(game:HttpGet('https://gist.githubusercontent.com/flurinios-accorney/ab48b0a316294adcb235374031af4c50/raw/linoraui.lua'))()
+local ThemeManager = loadstring(game:HttpGet('https://gist.githubusercontent.com/flurinios-accorney/23cffd623d3d73bbc0d70a3204862b9a/raw/linorathememanager.lua'))()
+local SaveManager = loadstring(game:HttpGet('https://gist.githubusercontent.com/flurinios-accorney/c58d7836d55e6ae5ef1f62108c29bff8/raw/linorasavemanager.lua'))()
 
 -- services
 local players = game:GetService("Players")
@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.4.1'
+local ver = 'v0.4.2'
 
 local messageCache = {}
 local activeMessages = {}
@@ -604,7 +604,7 @@ end
 -- utils
 local function downloadAudio(name)
 	local Time = tick()
-	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name, true))
+	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name))
 	if not success then
 		game.StarterGui:SetCore("SendNotification", {
 			Title = 'ERROR';
@@ -635,7 +635,7 @@ local function checkForUpdates(name)
 		return
 	end
 	
-	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name, true)
+	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name)
 	
 	if not success then
 		return
