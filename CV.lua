@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.4.2'
+local ver = 'v0.4.3'
 
 local messageCache = {}
 local activeMessages = {}
@@ -630,6 +630,7 @@ local function downloadAudio(name)
 	return true
 end
 
+--[[ way too slow, gotta find another way
 local function checkForUpdates(name)
 	if not isfile("CustomMusic/"..name) then
 		return
@@ -639,14 +640,14 @@ local function checkForUpdates(name)
 	
 	if not success then
 		return
-		--[[game.StarterGui:SetCore("SendNotification", {
+		game.StarterGui:SetCore("SendNotification", {
 			Title = 'REMOVED';
 			Text = "audio ("..name..") is not present on the cloud";
 			Icon = "rbxassetid://2541869220";
 			Duration = 5;
 		})
 		delfile("CustomMusic/"..name)
-		return]]
+		return
 	end
 	
 	local content = readfile("CustomMusic/"..name)
@@ -661,7 +662,7 @@ local function checkForUpdates(name)
 		downloadAudio(name)
 		return
 	end
-end
+end]]
 
 local function preloadAmbients()
 	if not isfolder("CustomMusic") then
@@ -672,7 +673,7 @@ local function preloadAmbients()
 		-- ambient
 		local nameAmbient = i..".ambient.mp3"
 		
-		checkForUpdates(nameAmbient)
+		--checkForUpdates(nameAmbient)
 		
 		if not isfile("CustomMusic/"..nameAmbient) then
 			local succ = downloadAudio(nameAmbient)
@@ -692,7 +693,7 @@ local function preloadAmbients()
 		if v.combat then
 			local nameCombat = i..".combat.mp3"
 			
-			checkForUpdates(nameCombat)
+			--checkForUpdates(nameCombat)
 			
 			if not isfile("CustomMusic/"..nameCombat) then
 				local succ = downloadAudio(nameCombat)
