@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.2'
+local ver = 'v0.3.3'
 
 local options = {
 	showMessagesNearName = true,
@@ -550,7 +550,7 @@ shared.CV_CharCon = {}
 
 
 -- tweening drawing api stuff
-function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
+local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
 	local Start = {}
 	local CurrentTime = 0
 	
@@ -1247,18 +1247,16 @@ end
 local function updateMessages()
 	cachedLabel.TextLabel.Text = 'Currently: ' .. #messageCache .. ' logged'
 	
-	task.spawn(function()
-		for index,value in pairs(activeMessages) do
-			local player = value.Player
-			
-			table.foreach(value.Instances, function(guid,instance)
-				task.spawn(updateCurrentInstance, player, guid, instance)
-			end)
-			table.foreach(value.OldInstances, function(guid,instance)
-				task.spawn(updateOldInstance, player, guid, instance)
-			end)
-		end
-	end)
+	for index,value in pairs(activeMessages) do
+		local player = value.Player
+		
+		table.foreach(value.Instances, function(guid,instance)
+			task.spawn(updateCurrentInstance, player, guid, instance)
+		end)
+		table.foreach(value.OldInstances, function(guid,instance)
+			task.spawn(updateOldInstance, player, guid, instance)
+		end)
+	end
 end
 
 local function clearOldSound(sound)
@@ -1454,10 +1452,12 @@ for i,player in pairs(players:GetChildren()) do
 end
 
 shared.CV_RenderSteppedCon = runService.RenderStepped:Connect(function(deltaTime)
-	if (os.clock() - LastRefresh) > (options.refreshRate / 1000) then
-		LastRefresh = os.clock()
-		
-		task.spawn(updateMessages)
-		task.spawn(updateAmbient)
-	end
+	task.spawn(function()
+		if (os.clock() - LastRefresh) > (options.refreshRate / 1000) then
+			LastRefresh = os.clock()
+			
+			task.spawn(updateMessages)
+			task.spawn(updateAmbient)
+		end
+	end)
 end)
