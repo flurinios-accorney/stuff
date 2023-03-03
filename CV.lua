@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.7'
+local ver = 'v0.3.8'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1296,10 +1296,11 @@ local function updateAmbient()
 	if isCombat then
 		if not combat.IsPlaying then
 			lastTimePos.ambient = ambient.TimePosition
-			local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0}):Play()
+			local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
 			tween.Completed:Connect(function(playbackState)
 				ambient:Pause()
 			end)
+			tween:Play()
 			
 			shouldTween, shouldTweenWhat = true, 1
 			combat.TimePosition = lastTimePos.combat
@@ -1309,10 +1310,11 @@ local function updateAmbient()
 	else
 		if not ambient.IsPlaying then
 			lastTimePos.combat = combat.TimePosition
-			local tween = tweenService:Create(combat, tweenInfo, {Volume = 0}):Play()
+			local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
 			tween.Completed:Connect(function(playbackState)
 				combat:Pause()
 			end)
+			tween:Play()
 			
 			shouldTween, shouldTweenWhat = true, 0
 			ambient.TimePosition = lastTimePos.ambient
