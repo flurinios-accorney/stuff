@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.3'
+local ver = 'v0.3.4'
 
 local options = {
 	showMessagesNearName = true,
@@ -541,12 +541,12 @@ if shared.CV_ChatCon then
 	end
 end
 shared.CV_ChatCon = {}
-if shared.CV_CharCon then
+--[[if shared.CV_CharCon then
 	for i,v in pairs(shared.CV_CharCon) do
 		shared.CV_CharCon[i]:Disconnect()
 	end
 end
-shared.CV_CharCon = {}
+shared.CV_CharCon = {}]]
 
 
 -- tweening drawing api stuff
@@ -1424,10 +1424,10 @@ local function playerAdded(player)
 	end)
 	shared.CV_ChatCon[player.UserId] = pChattedCon
 	
-	local characterRemovingCon = player.CharacterRemoving:Connect(function(character)
-		SaveManager:Save('Default')
+	--[[local characterRemovingCon = player.CharacterRemoving:Connect(function(character)
+		task.spawn(function() SaveManager:Save('Default') end)
 	end)
-	shared.CV_CharCon[player.UserId] = characterRemovingCon
+	shared.CV_CharCon[player.UserId] = characterRemovingCon]]
 end
 
 local function playerRemoving(player)
