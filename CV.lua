@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.5'
+local ver = 'v0.3.6'
 
 local messageCache = {}
 local activeMessages = {}
@@ -541,7 +541,7 @@ shared.CV_CharCon = {}]]
 
 
 -- tweening drawing api stuff
-local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
+local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck)
 	local Start = {}
 	local CurrentTime = 0
 	
@@ -595,9 +595,6 @@ local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck, OnEnd)
 				end
 			end
 		else
-			if OnEnd then
-				task.spawn(OnEnd)
-			end
 			Connection:Disconnect()
 		end
 	end)
@@ -1242,7 +1239,7 @@ end
 
 local function clearOldSound(sound)
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	task.spawn(tweenDrawing, sound, tweenInfo, {Volume = 0}, false)
+	tweenService:Create(sound, tweenInfo, {Volume = 0}):Play()
 	game:GetService("Debris"):AddItem(sound, 1)
 end
 
@@ -1258,7 +1255,7 @@ local function updateAmbient()
 	
 	local isCombat = isInDanger()
 	
-	local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local shouldTween, shouldTweenWhat = false, -1
 	
 	-- new
@@ -1295,10 +1292,10 @@ local function updateAmbient()
 	if isCombat then
 		if not combat.IsPlaying then
 			lastTimePos.ambient = ambient.TimePosition
-			local onEnd = function()
+			local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0}):Play()
+			tween.Completed:Connect(function(playbackState)
 				ambient:Pause()
-			end
-			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = 0}, false, onEnd)
+			end)
 			
 			shouldTween, shouldTweenWhat = true, 1
 			combat.TimePosition = lastTimePos.combat
@@ -1308,10 +1305,10 @@ local function updateAmbient()
 	else
 		if not ambient.IsPlaying then
 			lastTimePos.combat = combat.TimePosition
-			local onEnd = function()
+			local tween = tweenService:Create(combat, tweenInfo, {Volume = 0}):Play()
+			tween.Completed:Connect(function(playbackState)
 				combat:Pause()
-			end
-			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = 0}, false, onEnd)
+			end)
 			
 			shouldTween, shouldTweenWhat = true, 0
 			ambient.TimePosition = lastTimePos.ambient
@@ -1325,7 +1322,7 @@ local function updateAmbient()
 	local combatVolume = PlayCustomAmbient.Value and area.combat.volume * Options.AmbientVolume.Value or 0
 	if not isCombat then
 		if shouldTween and shouldTweenWhat == 0 then
-			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = ambientVolume}, false)
+			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
 		else
 			ambient.Volume = ambientVolume
 		end
@@ -1333,7 +1330,7 @@ local function updateAmbient()
 	if isCombat then
 		if shouldTween and shouldTweenWhat == 1 then
 			shouldTween = false
-			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = combatVolume}, false)
+			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
 			combat.Volume = combatVolume
 		end
@@ -1403,11 +1400,6 @@ local function playerAdded(player)
 		chatted(player, msg)
 	end)
 	shared.CV_ChatCon[player.UserId] = pChattedCon
-	
-	--[[local characterRemovingCon = player.CharacterRemoving:Connect(function(character)
-		task.spawn(function() SaveManager:Save('Default') end)
-	end)
-	shared.CV_CharCon[player.UserId] = characterRemovingCon]]
 end
 
 local function playerRemoving(player)
