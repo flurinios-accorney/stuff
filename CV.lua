@@ -604,7 +604,7 @@ end
 -- utils
 local function downloadAudio(name)
 	local Time = tick()
-	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name))
+	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name)
 	if not success then
 		game.StarterGui:SetCore("SendNotification", {
 			Title = 'ERROR';
