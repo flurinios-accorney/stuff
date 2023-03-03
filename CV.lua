@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.9'
+local ver = 'v0.4.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -630,6 +630,39 @@ local function downloadAudio(name)
 	return true
 end
 
+local function checkForUpdates(name)
+	if not isfile("CustomMusic/"..name) then
+		return
+	end
+	
+	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name)
+	
+	if not success then
+		return
+		--[[game.StarterGui:SetCore("SendNotification", {
+			Title = 'REMOVED';
+			Text = "audio ("..name..") is not present on the cloud";
+			Icon = "rbxassetid://2541869220";
+			Duration = 5;
+		})
+		delfile("CustomMusic/"..name)
+		return]]
+	end
+	
+	local content = readfile("CustomMusic/"..name)
+	if file ~= content then
+		game.StarterGui:SetCore("SendNotification", {
+			Title = 'OUTDATED';
+			Text = "audio ("..name..") is outdated";
+			Icon = "rbxassetid://2541869220";
+			Duration = 5;
+		})
+		delfile("CustomMusic/"..name)
+		downloadAudio(name)
+		return
+	end
+end
+
 local function preloadAmbients()
 	if not isfolder("CustomMusic") then
 		makefolder("CustomMusic")
@@ -638,6 +671,8 @@ local function preloadAmbients()
 	for i,v in pairs(ambients) do
 		-- ambient
 		local nameAmbient = i..".ambient.mp3"
+		
+		checkForUpdates(nameAmbient)
 		
 		if not isfile("CustomMusic/"..nameAmbient) then
 			local succ = downloadAudio(nameAmbient)
@@ -656,6 +691,8 @@ local function preloadAmbients()
 		-- combat
 		if v.combat then
 			local nameCombat = i..".combat.mp3"
+			
+			checkForUpdates(nameCombat)
 			
 			if not isfile("CustomMusic/"..nameCombat) then
 				local succ = downloadAudio(nameCombat)
