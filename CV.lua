@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.4.3'
+local ver = 'v0.4.4'
 
 local messageCache = {}
 local activeMessages = {}
@@ -558,7 +558,6 @@ local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck)
 		end
 	end
 	
-	local lastValue
 	local Connection
 	Connection = runService.RenderStepped:Connect(function(Delta)
 		if CurrentTime < RenderInfo.Time and Render then
@@ -574,13 +573,6 @@ local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck)
 				end
 				
 				if Render and success then
-					if lastValue then
-						if Render[Index] ~= lastValue then
-							Connection:Disconnect()
-							return
-						end
-					end
-					
 					if typeof(Value) == "number" then
 						Render[Index] = (Value * TweenedValue) + Start[Index]
 					elseif typeof(Value) == "Vector2" then
@@ -588,8 +580,6 @@ local function tweenDrawing(Render, RenderInfo, RenderTo, doCheck)
 					elseif typeof(Value) == "function" then
 						Render[Index] = Value(TweenedValue)
 					end
-					
-					lastValue = Render[Index]
 				else
 					Connection:Disconnect()
 				end
@@ -1439,7 +1429,8 @@ local function playerAdded(player)
 	activeMessages[player.UserId] = newPlayer
 	
 	local pChattedCon = player.Chatted:Connect(function(msg)
-		chatted(player, msg)
+		printconsole(msg,255,255,255)
+		task.spawn(chatted, player, msg)
 	end)
 	shared.CV_ChatCon[player.UserId] = pChattedCon
 end
