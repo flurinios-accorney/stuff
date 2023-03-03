@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.8'
+local ver = 'v0.3.9'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1261,8 +1261,7 @@ local function updateAmbient()
 	-- new
 	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
 		if ambient then
-			local oldAmbient = ambient
-			task.spawn(clearOldSound, oldAmbient)
+			clearOldSound(ambient)
 		end
 		
 		lastTimePos.ambient = 0
@@ -1277,8 +1276,7 @@ local function updateAmbient()
 	end
 	if not combat or combat.SoundId ~= area.combat.id and isCombat then
 		if combat then
-			local oldCombat = combat
-			task.spawn(clearOldSound, oldCombat)
+			clearOldSound(combat)
 		end
 		
 		lastTimePos.combat = 0
