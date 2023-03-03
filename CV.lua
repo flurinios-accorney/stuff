@@ -30,17 +30,8 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.3.4'
+local ver = 'v0.3.5'
 
-local options = {
-	showMessagesNearName = true,
-	showOldMessages = true,
-	playCustomAmbient = false,
-	messagesNearNameSize = 21,
-	oldMessagesSize = 18,
-	refreshRate = 15,
-	ambientVolume = 0
-}
 local messageCache = {}
 local activeMessages = {}
 local LastRefresh = 0
@@ -955,12 +946,7 @@ local function clearMessage(player, group, guid)
 	end)
 end
 
-local function isClipped(uiObject)
-	local parent = uiObject.Parent
-	if not parent then
-		return
-	end
-	
+local function isClipped(uiObject, parent)
 	local boundryTop = parent.AbsolutePosition
 	local boundryBot = boundryTop + parent.AbsoluteSize
 	
@@ -992,7 +978,7 @@ local function newText(player, textTable, frame, group, extra)
 		label1.Color = getColor(player, textTable.lavel1, true)
 	end
 	label1.Text = textTable.label1
-	label1.Size = extra.size and extra.size or options.messagesNearNameSize
+	label1.Size = extra.size and extra.size or Options.MessagesNearNameSize.Value
 	label1.Center = false
 	label1.Outline = true
 	label1.OutlineColor = Color3.fromRGB(0, 0, 0)
@@ -1007,7 +993,7 @@ local function newText(player, textTable, frame, group, extra)
 		label2.Color = getColor(player, textTable.label2, false)
 	end
 	label2.Text = textTable.label2
-	label2.Size = extra.size and extra.size or options.messagesNearNameSize
+	label2.Size = extra.size and extra.size or Options.MessagesNearNameSize.Value
 	label2.Center = false
 	label2.Outline = true
 	label2.OutlineColor = Color3.fromRGB(0, 0, 0)
@@ -1121,7 +1107,6 @@ Ambients:AddSlider('AmbientVolume', {
 
 PlayCustomAmbient:OnChanged(function()
 	SaveManager:Save('Default')
-	options.playCustomAmbient = PlayCustomAmbient.Value
 end)
 ShowMessagesName:OnChanged(function()
 	if not ShowMessagesName.Value and ShowOldMessages.Value then
@@ -1129,7 +1114,6 @@ ShowMessagesName:OnChanged(function()
 	end
 	
 	SaveManager:Save('Default')
-	options.showMessagesNearName = ShowMessagesName.Value
 end)
 ShowOldMessages:OnChanged(function()
 	if not ShowMessagesName.Value and ShowOldMessages.Value then
@@ -1137,19 +1121,15 @@ ShowOldMessages:OnChanged(function()
 	end
 	
 	SaveManager:Save('Default')
-	options.showOldMessages = ShowOldMessages.Value
 end)
 Options.MessagesNearNameSize:OnChanged(function()
 	SaveManager:Save('Default')
-	options.messagesNearNameSize = Options.MessagesNearNameSize.Value
 end)
 Options.OldMessagesSize:OnChanged(function()
 	SaveManager:Save('Default')
-	options.oldMessagesSize = Options.OldMessagesSize.Value
 end)
 Options.RefreshRate:OnChanged(function()
 	SaveManager:Save('Default')
-	options.refreshRate = Options.RefreshRate.Value
 end)
 Options.AmbientVolume:OnChanged(function()
 	SaveManager:Save('Default')
@@ -1184,18 +1164,19 @@ local function updateCurrentInstance(player, guid, instance)
 		return
 	end
 	
-	if isClipped(frame) then
-		activeMessages[player.UserId].Instances[guid].text.label2.Visible = false
-		return
-	end
-	
-	if not options.showMessagesNearName then
+	if not ShowMessagesName.Value then
 		activeMessages[player.UserId].Instances[guid].text.label2.Visible = false
 		return
 	end
 	
 	local parent = frame.Parent
 	if not parent then
+		activeMessages[player.UserId].Instances[guid].text.label2.Visible = false
+		return
+	end
+	
+	if isClipped(frame, parent) then
+		activeMessages[player.UserId].Instances[guid].text.label2.Visible = false
 		return
 	end
 	
@@ -1278,7 +1259,7 @@ local function updateAmbient()
 	local isCombat = isInDanger()
 	
 	local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	local shouldTween = false
+	local shouldTween, shouldTweenWhat = false, -1
 	
 	-- new
 	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
@@ -1319,7 +1300,7 @@ local function updateAmbient()
 			end
 			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = 0}, false, onEnd)
 			
-			shouldTween = true
+			shouldTween, shouldTweenWhat = true, 1
 			combat.TimePosition = lastTimePos.combat
 			combat.Volume = 0
 			combat:Resume()
@@ -1332,7 +1313,7 @@ local function updateAmbient()
 			end
 			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = 0}, false, onEnd)
 			
-			shouldTween = true
+			shouldTween, shouldTweenWhat = true, 0
 			ambient.TimePosition = lastTimePos.ambient
 			ambient.Volume = 0
 			ambient:Resume()
@@ -1340,18 +1321,17 @@ local function updateAmbient()
 	end
 	
 	-- volume
-	local ambientVolume = options.playCustomAmbient and area.ambient.volume * Options.AmbientVolume.Value or 0
-	local combatVolume = options.playCustomAmbient and area.combat.volume * Options.AmbientVolume.Value or 0
+	local ambientVolume = PlayCustomAmbient.Value and area.ambient.volume * Options.AmbientVolume.Value or 0
+	local combatVolume = PlayCustomAmbient.Value and area.combat.volume * Options.AmbientVolume.Value or 0
 	if not isCombat then
-		if shouldTween then
-			shouldTween = false
+		if shouldTween and shouldTweenWhat == 0 then
 			task.spawn(tweenDrawing, ambient, tweenInfo, {Volume = ambientVolume}, false)
 		else
 			ambient.Volume = ambientVolume
 		end
 	end
 	if isCombat then
-		if shouldTween then
+		if shouldTween and shouldTweenWhat == 1 then
 			shouldTween = false
 			task.spawn(tweenDrawing, combat, tweenInfo, {Volume = combatVolume}, false)
 		else
@@ -1381,7 +1361,7 @@ local function chatted(player, msg)
 	task.spawn(function()
 		-- handle old messages yet to disappear
 		table.foreach(activeMessages[player.UserId].Instances, function(guid,instance)
-			if not options.showOldMessages then
+			if not ShowOldMessages.Value then
 				return
 			end
 			
@@ -1397,7 +1377,7 @@ local function chatted(player, msg)
 			-- add instance to bottom left
 			local extra = {}
 			extra.index = getTotalOldMessages()+1
-			extra.size = options.oldMessagesSize
+			extra.size = Options.OldMessagesSize.Value
 			extra.delay = 8
 			task.spawn(newText, player, {label1 = name, label2 = text}, instance.frame, "OldInstances", extra)
 			
@@ -1453,7 +1433,7 @@ end
 
 shared.CV_RenderSteppedCon = runService.RenderStepped:Connect(function(deltaTime)
 	task.spawn(function()
-		if (os.clock() - LastRefresh) > (options.refreshRate / 1000) then
+		if (os.clock() - LastRefresh) > (Options.RefreshRate.Value / 1000) then
 			LastRefresh = os.clock()
 			
 			task.spawn(updateMessages)
