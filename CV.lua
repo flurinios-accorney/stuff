@@ -24,13 +24,8 @@ local coreGui = game:GetService("CoreGui")
 local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
--- deepwoken gui stuff
-local leaderboard = playerGui:WaitForChild("LeaderboardGui", math.huge)
-local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
-local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
-
 -- vars
-local ver = 'v0.4.5'
+local ver = 'v0.4.6'
 
 local messageCache = {}
 local activeMessages = {}
@@ -799,7 +794,11 @@ local function getHigherMessages(instanceIndex)
 	return messages
 end
 
-local function getPlayerFrame(player, characterName)	
+local function getPlayerFrame(player, characterName)
+	local leaderboard = playerGui:WaitForChild("LeaderboardGui", math.huge)
+	local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
+	local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
+	
 	for _,frame in pairs(scrollingFrame:GetChildren()) do
 		if frame.ClassName == "Frame" then
 			if frame.Player.Text == characterName or frame.Player.Text == player.Name then
@@ -1177,11 +1176,6 @@ SaveManager:Load('Default')
 
 -- update loop
 local function updateCurrentInstance(player, guid, instance)
-	--[[if not leaderboardFrame.Visible then
-		activeMessages[player.UserId].Instances[guid].text.label2.Visible = false
-		return
-	end]]
-	
 	local frame = instance.frame
 	if not frame then
 		-- delete message
@@ -1219,6 +1213,8 @@ local function updateCurrentInstance(player, guid, instance)
 end
 
 local function updateOldInstance(player, guid, instance)
+	local leaderboard = playerGui:WaitForChild("LeaderboardGui", math.huge)
+	
 	local frame = instance.frame
 	if not frame then
 		-- delete message
@@ -1374,20 +1370,16 @@ end
 local function chatted(player, msg)
 	local character = player.Character
 	if not character then
-		printconsole("no char",255,255,255)
 		return
 	end
 	local humanoid = character:WaitForChild("Humanoid", math.huge)
 	if not humanoid then
-		printconsole("no humanoid",255,255,255)
 		return
 	end
 	local characterName = humanoid:GetAttribute("CharacterName")
-	printconsole("charname: "..characterName,255,255,255)
 	
 	local frame = getPlayerFrame(player, characterName)
 	if not frame then
-		printconsole("no frame",255,255,255)
 		return
 	end
 	
@@ -1433,7 +1425,6 @@ local function playerAdded(player)
 	activeMessages[player.UserId] = newPlayer
 	
 	local pChattedCon = player.Chatted:Connect(function(msg)
-		printconsole(msg,255,255,255)
 		task.spawn(chatted, player, msg)
 	end)
 	shared.CV_ChatCon[player.UserId] = pChattedCon
