@@ -30,7 +30,7 @@ local leaderboardFrame = leaderboard:WaitForChild("MainFrame", math.huge)
 local scrollingFrame = leaderboardFrame:WaitForChild("ScrollingFrame", math.huge)
 
 -- vars
-local ver = 'v0.4.4'
+local ver = 'v0.4.5'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1374,16 +1374,20 @@ end
 local function chatted(player, msg)
 	local character = player.Character
 	if not character then
+		printconsole("no char",255,255,255)
 		return
 	end
 	local humanoid = character:WaitForChild("Humanoid", math.huge)
 	if not humanoid then
+		printconsole("no humanoid",255,255,255)
 		return
 	end
 	local characterName = humanoid:GetAttribute("CharacterName")
+	printconsole("charname: "..characterName,255,255,255)
 	
 	local frame = getPlayerFrame(player, characterName)
 	if not frame then
+		printconsole("no frame",255,255,255)
 		return
 	end
 	
