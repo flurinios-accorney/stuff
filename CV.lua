@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.4.10'
+local ver = 'v0.5.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -607,12 +607,59 @@ local function downloadAudio(name)
 	return true
 end
 
+local function getVersion()
+	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/version.json')
+	if not success then
+		Library:Notify("[ERROR] Failed to download version", 7)
+		return false, nil
+	end
+	return true, file
+end
+
+local function downloadVersion()
+	local success, file = getVersion()
+	if not success then
+		return false
+	end
+	
+	local succ, cess = pcall(writefile, "CustomMusic/Version.json", file)
+	if not succ then
+		Library:Notify("[ERROR] Failed to write file version", 7)
+		return false
+	end
+	return true
+end
+
 local function preloadAmbients()
 	Library:Notify("Preloading ambients..", 3)
 	
 	if not isfolder("CustomMusic") then
 		makefolder("CustomMusic")
 	end
+	
+	local localVersion = isfile("CustomMusic/Version.json") and httpService:JSONDecode(readfile("CustomMusic/Version.json")).version or nil
+	local succ, file = getVersion()
+	if not succ then
+		printconsole("Failed to download version",255,0,0)
+		return
+	end
+	local cloudVersion = httpService:JSONDecode(file).version
+	-- outdated
+	if localVersion ~= cloudVersion then
+		local files = listfiles("CustomMusic")
+		-- remove old files
+		for i,v in pairs(files) do
+			delfile(v)
+		end
+		
+		-- update version file
+		local succ = downloadVersion()
+		if not succ then
+			printconsole("Failed to download version",255,0,0)
+			return
+		end
+	end
+	
 	
 	for i,v in pairs(ambients) do
 		-- ambient
