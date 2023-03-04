@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.5.0'
+local ver = 'v0.5.1'
 
 local messageCache = {}
 local activeMessages = {}
@@ -646,6 +646,8 @@ local function preloadAmbients()
 	local cloudVersion = httpService:JSONDecode(file).version
 	-- outdated
 	if localVersion ~= cloudVersion then
+		Library:Notify("[WARNING] Local version outdated, updating..", 7)
+		
 		local files = listfiles("CustomMusic")
 		-- remove old files
 		for i,v in pairs(files) do
