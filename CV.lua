@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.4.9'
+local ver = 'v0.4.10'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1243,35 +1243,38 @@ local function updateAmbient()
 	local shouldTween, shouldTweenWhat = false, -1
 	
 	-- new
-	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
-		if ambient then
-			task.spawn(clearOldSound, ambient)
+	if isCombat then
+		if not combat or combat.SoundId ~= area.combat.id then
+			if combat then
+				task.spawn(clearOldSound, combat)
+			end
+			
+			lastTimePos.combat = 0
+			
+			local newCombat = Instance.new("Sound")
+			newCombat.Name = "Combat"
+			newCombat.Looped = true
+			newCombat.Volume = 0
+			newCombat.Parent = coreGui
+			newCombat.SoundId = area.combat.id
+			combat = newCombat
 		end
-		
-		lastTimePos.ambient = 0
-		
-		local newAmbient = Instance.new("Sound")
-		newAmbient.Name = "Ambient"
-		newAmbient.Looped = true
-		newAmbient.Volume = 0
-		newAmbient.Parent = coreGui
-		newAmbient.SoundId = area.ambient.id
-		ambient = newAmbient
-	end
-	if not combat or combat.SoundId ~= area.combat.id and isCombat then
-		if combat then
-			task.spawn(clearOldSound, combat)
+	else
+		if not ambient or ambient.SoundId ~= area.ambient.id then
+			if ambient then
+				task.spawn(clearOldSound, ambient)
+			end
+			
+			lastTimePos.ambient = 0
+			
+			local newAmbient = Instance.new("Sound")
+			newAmbient.Name = "Ambient"
+			newAmbient.Looped = true
+			newAmbient.Volume = 0
+			newAmbient.Parent = coreGui
+			newAmbient.SoundId = area.ambient.id
+			ambient = newAmbient
 		end
-		
-		lastTimePos.combat = 0
-		
-		local newCombat = Instance.new("Sound")
-		newCombat.Name = "Combat"
-		newCombat.Looped = true
-		newCombat.Volume = 0
-		newCombat.Parent = coreGui
-		newCombat.SoundId = area.combat.id
-		combat = newCombat
 	end
 	
 	-- play - stop
