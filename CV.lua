@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.4.8'
+local ver = 'v0.4.9'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1308,18 +1308,17 @@ local function updateAmbient()
 	-- volume
 	local ambientVolume = PlayCustomAmbient.Value and area.ambient.volume * Options.AmbientVolume.Value or 0
 	local combatVolume = PlayCustomAmbient.Value and area.combat.volume * Options.AmbientVolume.Value or 0
-	if not isCombat then
-		if shouldTween and shouldTweenWhat == 0 then
-			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
-		else
-			ambient.Volume = ambientVolume
-		end
-	end
 	if isCombat then
 		if shouldTween and shouldTweenWhat == 1 then
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
 			combat.Volume = combatVolume
+		end
+	else
+		if shouldTween and shouldTweenWhat == 0 then
+			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
+		else
+			ambient.Volume = ambientVolume
 		end
 	end
 end
