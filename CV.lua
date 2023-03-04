@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.4.7'
+local ver = 'v0.4.8'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1317,7 +1317,6 @@ local function updateAmbient()
 	end
 	if isCombat then
 		if shouldTween and shouldTweenWhat == 1 then
-			shouldTween = false
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
 			combat.Volume = combatVolume
