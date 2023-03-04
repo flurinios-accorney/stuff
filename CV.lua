@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.5.1'
+local ver = 'v0.5.2'
 
 local messageCache = {}
 local activeMessages = {}
@@ -643,6 +643,7 @@ local function preloadAmbients()
 		printconsole("Failed to download version",255,0,0)
 		return
 	end
+	printconsole(tostring(file),255,255,255)
 	local cloudVersion = httpService:JSONDecode(file).version
 	-- outdated
 	if localVersion ~= cloudVersion then
