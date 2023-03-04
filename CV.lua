@@ -19,13 +19,14 @@ local tweenService = game:GetService("TweenService")
 local runService = game:GetService("RunService")
 local httpService = game:GetService("HttpService")
 local coreGui = game:GetService("CoreGui")
+local debris = game:GetService("Debris")
 
 -- player
 local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.4.6'
+local ver = 'v0.4.7'
 
 local messageCache = {}
 local activeMessages = {}
@@ -591,65 +592,24 @@ local function downloadAudio(name)
 	local Time = tick()
 	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name)
 	if not success then
-		game.StarterGui:SetCore("SendNotification", {
-			Title = 'ERROR';
-			Text = "Failed to download audio.";
-			Icon = "rbxassetid://2541869220";
-			Duration = 7;
-		})
+		Library:Notify("[ERROR] Failed to download audio ("..name..")", 7)
 		return false
 	end
 	
 	Time = tostring(tick() - Time)
 	local succ, cess = pcall(writefile, "CustomMusic/"..name, file)
 	if not succ then
-		printconsole(cess, 255, 255, 255)
+		Library:Notify("[ERROR] Failed to write file audio ("..name..")", 7)
+		return false
 	end
 	
-	game.StarterGui:SetCore("SendNotification", {
-		Title = 'Done!';
-		Text = "Audio ("..name..") is now downloaded. (Took "..string.sub(Time,1,4).." seconds)";
-		Icon = "rbxassetid://2541869220";
-		Duration = 5;
-	})
+	Library:Notify("[Done!] Audio ("..name..") is now downloaded. (Took "..string.sub(Time,1,4).." seconds)", 5)
 	return true
 end
 
---[[ way too slow, gotta find another way
-local function checkForUpdates(name)
-	if not isfile("CustomMusic/"..name) then
-		return
-	end
-	
-	local success, file = pcall(game.HttpGet, game, 'https://raw.githubusercontent.com/flurinios-accorney/stuff/main/'..name)
-	
-	if not success then
-		return
-		game.StarterGui:SetCore("SendNotification", {
-			Title = 'REMOVED';
-			Text = "audio ("..name..") is not present on the cloud";
-			Icon = "rbxassetid://2541869220";
-			Duration = 5;
-		})
-		delfile("CustomMusic/"..name)
-		return
-	end
-	
-	local content = readfile("CustomMusic/"..name)
-	if file ~= content then
-		game.StarterGui:SetCore("SendNotification", {
-			Title = 'OUTDATED';
-			Text = "audio ("..name..") is outdated";
-			Icon = "rbxassetid://2541869220";
-			Duration = 5;
-		})
-		delfile("CustomMusic/"..name)
-		downloadAudio(name)
-		return
-	end
-end]]
-
 local function preloadAmbients()
+	Library:Notify("Preloading ambients..", 3)
+	
 	if not isfolder("CustomMusic") then
 		makefolder("CustomMusic")
 	end
@@ -657,9 +617,7 @@ local function preloadAmbients()
 	for i,v in pairs(ambients) do
 		-- ambient
 		local nameAmbient = i..".ambient.mp3"
-		
-		--checkForUpdates(nameAmbient)
-		
+				
 		if not isfile("CustomMusic/"..nameAmbient) then
 			local succ = downloadAudio(nameAmbient)
 			if not succ then
@@ -677,9 +635,7 @@ local function preloadAmbients()
 		-- combat
 		if v.combat then
 			local nameCombat = i..".combat.mp3"
-			
-			--checkForUpdates(nameCombat)
-			
+						
 			if not isfile("CustomMusic/"..nameCombat) then
 				local succ = downloadAudio(nameCombat)
 				if not succ then
@@ -980,7 +936,6 @@ local function isClipped(uiObject, parent)
 	local function cmpVectors(a, b)
 		return (a.X < b.X) or (a.Y < b.Y)
 	end
-	
 	return cmpVectors(top, boundryTop) or cmpVectors(boundryBot, bot)
 end
 
@@ -1081,6 +1036,11 @@ end)
 local SendMessages = Webhooks:AddButton('Export messages', function()
 	SaveManager:Save('Default')
 	local success, body = exportWithHook()
+	if not success then
+		Library:Notify("[ERROR] Failed to export saved messages", 7)
+		return
+	end
+	Library:Notify("[Done!] Successfully exported saved messages", 5)
 end)
 local ClearCachedMessages = Webhooks:AddButton('Clear saved messages', function()
 	SaveManager:Save('Default')
@@ -1264,7 +1224,7 @@ end
 local function clearOldSound(sound)
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	tweenService:Create(sound, tweenInfo, {Volume = 0}):Play()
-	game:GetService("Debris"):AddItem(sound, 1)
+	debris:AddItem(sound, 1)
 end
 
 local lastTimePos = {ambient = 0, combat = 0}
@@ -1285,7 +1245,7 @@ local function updateAmbient()
 	-- new
 	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
 		if ambient then
-			clearOldSound(ambient)
+			task.spawn(clearOldSound, ambient)
 		end
 		
 		lastTimePos.ambient = 0
@@ -1300,7 +1260,7 @@ local function updateAmbient()
 	end
 	if not combat or combat.SoundId ~= area.combat.id and isCombat then
 		if combat then
-			clearOldSound(combat)
+			task.spawn(clearOldSound, combat)
 		end
 		
 		lastTimePos.combat = 0
@@ -1425,7 +1385,7 @@ local function playerAdded(player)
 	activeMessages[player.UserId] = newPlayer
 	
 	local pChattedCon = player.Chatted:Connect(function(msg)
-		task.spawn(chatted, player, msg)
+		chatted(player, msg)
 	end)
 	shared.CV_ChatCon[player.UserId] = pChattedCon
 end
@@ -1452,12 +1412,10 @@ for i,player in pairs(players:GetChildren()) do
 end
 
 shared.CV_RenderSteppedCon = runService.RenderStepped:Connect(function(deltaTime)
-	task.spawn(function()
-		if (os.clock() - LastRefresh) > (Options.RefreshRate.Value / 1000) then
-			LastRefresh = os.clock()
-			
-			task.spawn(updateMessages)
-			task.spawn(updateAmbient)
-		end
-	end)
+	if (os.clock() - LastRefresh) > (Options.RefreshRate.Value / 1000) then
+		LastRefresh = os.clock()
+		
+		task.spawn(updateMessages)
+		task.spawn(updateAmbient)
+	end
 end)
