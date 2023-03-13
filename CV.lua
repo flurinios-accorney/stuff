@@ -26,11 +26,12 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.6.1'
+local ver = 'v0.6.2'
 
 local messageCache = {}
 local activeMessages = {}
 local LastRefresh = 0
+local lastCheckedChance = 0
 
 local keywords = {
 	"clip","hack","exploit",
@@ -718,8 +719,11 @@ local function isInDanger()
 end
 
 local function getChance(x)
-	if math.random() < x then
+	if math.random() < x and (os.clock() - lastCheckedChance) > 1 then
 		return true
+	end
+	if (os.clock() - lastCheckedChance) > 1 then
+		lastCheckedChance = os.clock()
 	end
 	return false
 end
@@ -1306,6 +1310,8 @@ local function updateAmbient()
 	
 	-- new
 	if not combat or combat.SoundId ~= area.combat.id and isCombat then
+		lastCheckedChance = 0
+		
 		if combat then
 			task.spawn(clearOldSound, combat)
 		end
@@ -1321,6 +1327,8 @@ local function updateAmbient()
 		combat = newCombat
 	end
 	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
+		lastCheckedChance = 0
+		
 		if ambient then
 			task.spawn(clearOldSound, ambient)
 		end
@@ -1368,12 +1376,12 @@ local function updateAmbient()
 	end
 	
 	-- check skips
-	if area.ambient.skip and ambient.IsPlaying and not shouldTweenWhat == 0 then
+	if area.ambient.skip and ambient.IsPlaying then
 		if ambient.TimePosition >= area.ambient.skip.from and ambient.TimePosition < area.ambient.skip.to and not getChance(area.ambient.skip.chanceNotTo) then
 			ambient.TimePosition = area.ambient.skip.to
 		end
 	end
-	if area.combat.skip and combat.IsPlaying and not shouldTweenWhat == 1 then
+	if area.combat.skip and combat.IsPlaying then
 		if combat.TimePosition >= area.combat.skip.from and combat.TimePosition < area.combat.skip.to and not getChance(area.combat.skip.chanceNotTo) then
 			combat.TimePosition = area.combat.skip.to
 		end
