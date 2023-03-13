@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.5.6'
+local ver = 'v0.6.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -345,6 +345,11 @@ local ambients = {
 	},
 	depths = {
 		ambient = {
+			skip = {
+				from = 6.5,
+				to = 27.8,
+				chanceNotTo = .1
+			}
 			volume = 1.5
 		},
 		combat = {
@@ -710,6 +715,13 @@ local function isInDanger()
 	local statsGui = playerGui:WaitForChild("StatsGui",math.huge)
 	local danger = statsGui:WaitForChild("Danger",math.huge)
 	return danger.Visible
+end
+
+local function getChance(x)
+	if math.random() < x then
+		return true
+	end
+	return false
 end
 
 local function getArea()
@@ -1290,7 +1302,7 @@ local function updateAmbient()
 	local isCombat = isInDanger()
 	
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	local shouldTween, shouldTweenWhat = false, -1
+	local shouldTweenWhat = -1
 	
 	-- new
 	if not combat or combat.SoundId ~= area.combat.id and isCombat then
@@ -1334,7 +1346,7 @@ local function updateAmbient()
 			end)
 			tween:Play()
 			
-			shouldTween, shouldTweenWhat = true, 1
+			shouldTweenWhat = 1
 			combat.TimePosition = lastTimePos.combat
 			combat.Volume = 0
 			combat:Resume()
@@ -1348,10 +1360,22 @@ local function updateAmbient()
 			end)
 			tween:Play()
 			
-			shouldTween, shouldTweenWhat = true, 0
+			shouldTweenWhat = 0
 			ambient.TimePosition = lastTimePos.ambient
 			ambient.Volume = 0
 			ambient:Resume()
+		end
+	end
+	
+	-- check skips
+	if area.ambient.skip and ambient.IsPlaying and not shouldTweenWhat == 0 then
+		if ambient.TimePosition >= area.ambient.skip.from and ambient.TimePosition < area.ambient.skip.to and not getChance(area.ambient.skip.chanceNotTo) then
+			ambient.TimePosition = area.ambient.skip.to
+		end
+	end
+	if area.combat.skip and combat.IsPlaying and not shouldTweenWhat == 1 then
+		if combat.TimePosition >= area.combat.skip.from and combat.TimePosition < area.combat.skip.to and not getChance(area.combat.skip.chanceNotTo) then
+			combat.TimePosition = area.combat.skip.to
 		end
 	end
 	
@@ -1359,13 +1383,13 @@ local function updateAmbient()
 	local ambientVolume = PlayCustomAmbient.Value and area.ambient.volume * Options.AmbientVolume.Value or 0
 	local combatVolume = PlayCustomAmbient.Value and area.combat.volume * Options.AmbientVolume.Value or 0
 	if isCombat then
-		if shouldTween and shouldTweenWhat == 1 then
+		if shouldTweenWhat == 1 then
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
 			combat.Volume = combatVolume
 		end
 	else
-		if shouldTween and shouldTweenWhat == 0 then
+		if shouldTweenWhat == 0 then
 			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
 		else
 			ambient.Volume = ambientVolume
