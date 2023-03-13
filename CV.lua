@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.6.2'
+local ver = 'v0.6.3'
 
 local messageCache = {}
 local activeMessages = {}
@@ -349,7 +349,7 @@ local ambients = {
 			skip = {
 				from = 6.5,
 				to = 27.8,
-				chanceNotTo = .1
+				chanceNotTo = .01
 			},
 			volume = 1.5
 		},
