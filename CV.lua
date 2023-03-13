@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.5.4'
+local ver = 'v0.5.5'
 
 local messageCache = {}
 local activeMessages = {}
@@ -40,6 +40,8 @@ local keywords = {
 
 local combat
 local ambient
+
+local lastTimePos = {ambient = 0, combat = 0}
 
 local ORIGINAL = {
 	forest = {
@@ -343,10 +345,10 @@ local ambients = {
 	},
 	depths = {
 		ambient = {
-			volume = 0.555
+			volume = 1
 		},
 		combat = {
-			volume = 0.35
+			volume = 0.5
 		}
 	},
 	sailing = {
@@ -684,7 +686,7 @@ local function preloadAmbients()
 		-- combat
 		if v.combat then
 			local nameCombat = i..".combat.mp3"
-						
+			
 			if not isfile("CustomMusic/"..nameCombat) then
 				local succ = downloadAudio(nameCombat)
 				if not succ then
@@ -1276,7 +1278,6 @@ local function clearOldSound(sound)
 	debris:AddItem(sound, 1)
 end
 
-local lastTimePos = {ambient = 0, combat = 0}
 local function updateAmbient()
 	local area = getAmbient()
 	if not area then
