@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.1'
+local ver = 'v0.7.2'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1358,7 +1358,7 @@ local function updateAmbient()
 		newAmbient.SoundId = area.ambient.id
 		ambient = newAmbient
 	end
-	if not special and area.special or area.special and special.SoundId ~= area.special.id and not isCombat then		
+	if not special and area.special or area.special and special.SoundId ~= area.special.id then
 		if special then
 			task.spawn(clearOldSound, special)
 		end
@@ -1398,18 +1398,20 @@ local function updateAmbient()
 			combat:Resume()
 		end
 	else
-		if not ambient.IsPlaying and not special.IsPlaying then
-			lastTimePos.combat = combat.TimePosition
-			local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
-			tween.Completed:Connect(function(playbackState)
-				combat:Pause()
-			end)
-			tween:Play()
-			
-			shouldTweenWhat = 0
-			ambient.TimePosition = lastTimePos.ambient
-			ambient.Volume = 0
-			ambient:Resume()
+		if not ambient.IsPlaying then
+			if not special or not special.IsPlaying then
+				lastTimePos.combat = combat.TimePosition
+				local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
+				tween.Completed:Connect(function(playbackState)
+					combat:Pause()
+				end)
+				tween:Play()
+				
+				shouldTweenWhat = 0
+				ambient.TimePosition = lastTimePos.ambient
+				ambient.Volume = 0
+				ambient:Resume()
+			end
 		end
 		if not special.IsPlaying and special and getChance(area.special.chance) then
 			if ambient.IsPlaying then
@@ -1417,6 +1419,14 @@ local function updateAmbient()
 				local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
 				tween.Completed:Connect(function(playbackState)
 					ambient:Pause()
+				end)
+				tween:Play()
+			end
+			if combat.IsPlaying then
+				lastTimePos.combat = combat.TimePosition
+				local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
+				tween.Completed:Connect(function(playbackState)
+					combat:Pause()
 				end)
 				tween:Play()
 			end
