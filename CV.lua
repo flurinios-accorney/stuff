@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.4'
+local ver = 'v0.7.5'
 
 local messageCache = {}
 local activeMessages = {}
@@ -767,7 +767,7 @@ local function getAmbient()
 		return nil
 	end
 	
-	return {ambient = song.ambient, combat = song.combat}
+	return {ambient = song.ambient, combat = song.combat, special = song.special}
 end
 
 local function getNameValue(pName)
@@ -1358,7 +1358,7 @@ local function updateAmbient()
 		newAmbient.SoundId = area.ambient.id
 		ambient = newAmbient
 	end
-	if not special and area.special or area.special and special.SoundId ~= area.special.id then
+	if not special and area.special or special and special.SoundId ~= area.special.id then
 		if special then
 			task.spawn(clearOldSound, special)
 		end
