@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.6.5'
+local ver = 'v0.6.6'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1376,7 +1376,7 @@ local function updateAmbient()
 	end
 	
 	-- check skips
-	if area.ambient.skip and ambient.IsPlaying then
+	--[[if area.ambient.skip and ambient.IsPlaying then
 		if ambient.TimePosition >= area.ambient.skip.from and ambient.TimePosition < area.ambient.skip.to and not getChance(area.ambient.skip.chanceNotTo) then
 			ambient.TimePosition = area.ambient.skip.to
 		end
@@ -1385,7 +1385,7 @@ local function updateAmbient()
 		if combat.TimePosition >= area.combat.skip.from and combat.TimePosition < area.combat.skip.to and not getChance(area.combat.skip.chanceNotTo) then
 			combat.TimePosition = area.combat.skip.to
 		end
-	end
+	end]]
 	
 	-- volume
 	local ambientVolume = PlayCustomAmbient.Value and area.ambient.volume * Options.AmbientVolume.Value or 0
