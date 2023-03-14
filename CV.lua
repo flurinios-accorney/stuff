@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.7'
+local ver = 'v0.7.8'
 
 local messageCache = {}
 local activeMessages = {}
@@ -353,7 +353,7 @@ local ambients = {
 			volume = 0.6
 		},
 		special = {
-			chance = .01,
+			chance = 3,
 			volume = 1.5
 		}
 	},
@@ -742,7 +742,7 @@ local function getChance(x)
 	if valid then
 		lastCheckedChance = os.clock()
 	end
-	if math.random() < x and valid then
+	if math.random(1,100) < x and valid then
 		return true
 	end
 	return false
