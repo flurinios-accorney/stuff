@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.5'
+local ver = 'v0.7.6'
 
 local messageCache = {}
 local activeMessages = {}
@@ -353,7 +353,7 @@ local ambients = {
 			volume = 0.6
 		},
 		special = {
-			chance = .35,
+			chance = .1,
 			volume = 1.5
 		}
 	},
@@ -738,11 +738,12 @@ local function isInDanger()
 end
 
 local function getChance(x)
-	if math.random() < x and (os.clock() - lastCheckedChance) > 1 then
-		return true
-	end
-	if (os.clock() - lastCheckedChance) > 1 then
+	local valid = (os.clock() - lastCheckedChance) > 1
+	if valid then
 		lastCheckedChance = os.clock()
+	end
+	if math.random() < x and valid then
+		return true
 	end
 	return false
 end
@@ -1415,6 +1416,7 @@ local function updateAmbient()
 		end
 		if special and not special.IsPlaying and getChance(area.special.chance) then
 			if ambient.IsPlaying then
+				lastTimePos.special = 0
 				lastTimePos.ambient = ambient.TimePosition
 				local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
 				tween.Completed:Connect(function(playbackState)
