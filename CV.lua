@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.6.6'
+local ver = 'v0.7.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -41,8 +41,9 @@ local keywords = {
 
 local combat
 local ambient
+local special
 
-local lastTimePos = {ambient = 0, combat = 0}
+local lastTimePos = {ambient = 0, combat = 0, special = 0}
 
 local ORIGINAL = {
 	forest = {
@@ -346,15 +347,14 @@ local ambients = {
 	},
 	depths = {
 		ambient = {
-			skip = {
-				from = 12.3,
-				to = 34,
-				chanceNotTo = .3
-			},
 			volume = 1.5
 		},
 		combat = {
 			volume = 0.6
+		},
+		special = {
+			chance = .35,
+			volume = 1.5
 		}
 	},
 	sailing = {
@@ -708,6 +708,25 @@ local function preloadAmbients()
 			end
 		else
 			v.combat = v.ambient
+		end
+		
+		-- special
+		if v.special then
+			local nameSpecial = i..".special.mp3"
+			
+			if not isfile("CustomMusic/"..nameSpecial) then
+				local succ = downloadAudio(nameSpecial)
+				if not succ then
+					printconsole("Failed to download: "..nameSpecial,255,0,0)
+					return
+				end
+			end
+			
+			v.special.id = getsynasset("CustomMusic/"..nameSpecial)
+			
+			if not v.special.volume then
+				v.special.volume = .55
+			end
 		end
 	end
 end
@@ -1309,9 +1328,7 @@ local function updateAmbient()
 	local shouldTweenWhat = -1
 	
 	-- new
-	if not combat or combat.SoundId ~= area.combat.id and isCombat then
-		lastCheckedChance = 0
-		
+	if not combat or combat.SoundId ~= area.combat.id and isCombat then		
 		if combat then
 			task.spawn(clearOldSound, combat)
 		end
@@ -1326,9 +1343,7 @@ local function updateAmbient()
 		newCombat.SoundId = area.combat.id
 		combat = newCombat
 	end
-	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
-		lastCheckedChance = 0
-		
+	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then		
 		if ambient then
 			task.spawn(clearOldSound, ambient)
 		end
@@ -1343,10 +1358,33 @@ local function updateAmbient()
 		newAmbient.SoundId = area.ambient.id
 		ambient = newAmbient
 	end
+	if not special and area.special or area.special and special.SoundId ~= area.special.id and not isCombat then		
+		if special then
+			task.spawn(clearOldSound, special)
+		end
+		
+		lastTimePos.special = 0
+		
+		local newSpecial = Instance.new("Sound")
+		newSpecial.Name = "Special"
+		newSpecial.Looped = false
+		newSpecial.Volume = 0
+		newSpecial.Parent = coreGui
+		newSpecial.SoundId = area.special.id
+		special = newSpecial
+	end
 	
 	-- play - stop
 	if isCombat then
 		if not combat.IsPlaying then
+			if special then
+				lastTimePos.special = special.TimePosition
+				local tween = tweenService:Create(special, tweenInfo, {Volume = 0})
+				tween.Completed:Connect(function(playbackState)
+					special:Pause()
+				end)
+				tween:Play()
+			end
 			lastTimePos.ambient = ambient.TimePosition
 			local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
 			tween.Completed:Connect(function(playbackState)
@@ -1360,7 +1398,7 @@ local function updateAmbient()
 			combat:Resume()
 		end
 	else
-		if not ambient.IsPlaying then
+		if not ambient.IsPlaying and not special.IsPlaying then
 			lastTimePos.combat = combat.TimePosition
 			local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
 			tween.Completed:Connect(function(playbackState)
@@ -1373,23 +1411,27 @@ local function updateAmbient()
 			ambient.Volume = 0
 			ambient:Resume()
 		end
-	end
-	
-	-- check skips
-	--[[if area.ambient.skip and ambient.IsPlaying then
-		if ambient.TimePosition >= area.ambient.skip.from and ambient.TimePosition < area.ambient.skip.to and not getChance(area.ambient.skip.chanceNotTo) then
-			ambient.TimePosition = area.ambient.skip.to
+		if not special.IsPlaying and special and getChance(area.special.chance) then
+			if ambient.IsPlaying then
+				lastTimePos.ambient = ambient.TimePosition
+				local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
+				tween.Completed:Connect(function(playbackState)
+					ambient:Pause()
+				end)
+				tween:Play()
+			end
+			
+			shouldTweenWhat = 2
+			special.TimePosition = lastTimePos.special
+			special.Volume = 0
+			special:Resume()
 		end
 	end
-	if area.combat.skip and combat.IsPlaying then
-		if combat.TimePosition >= area.combat.skip.from and combat.TimePosition < area.combat.skip.to and not getChance(area.combat.skip.chanceNotTo) then
-			combat.TimePosition = area.combat.skip.to
-		end
-	end]]
 	
 	-- volume
 	local ambientVolume = PlayCustomAmbient.Value and area.ambient.volume * Options.AmbientVolume.Value or 0
 	local combatVolume = PlayCustomAmbient.Value and area.combat.volume * Options.AmbientVolume.Value or 0
+	local specialVolume = PlayCustomAmbient.Value and area.special.volume * Options.AmbientVolume.Value or 0
 	if isCombat then
 		if shouldTweenWhat == 1 then
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
@@ -1399,8 +1441,14 @@ local function updateAmbient()
 	else
 		if shouldTweenWhat == 0 then
 			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
+		elseif shouldTweenWhat = 2 then
+			tweenService:Create(special, tweenInfo, {Volume = specialVolume}):Play()
 		else
-			ambient.Volume = ambientVolume
+			if not special.IsPlaying then
+				ambient.Volume = ambientVolume
+			else
+				special.Volume = specialVolume
+			end
 		end
 	end
 end
