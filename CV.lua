@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.10'
+local ver = 'v0.7.11'
 
 local messageCache = {}
 local activeMessages = {}
@@ -45,239 +45,38 @@ local special
 
 local lastTimePos = {ambient = 0, combat = 0, special = 0}
 
-local ORIGINAL = {
-	forest = {
-		ambient = {
-			id = 7143662033
-		}, 
-		combat = {
-			id = 4571360226
-		}
-	}, 
-	snow = {
-		ambient = {
-			id = 8295196681
-		}, 
-		combat = {
-			id = 8295343446
-		}
-	}, 
-	siege = {
-		ambient = {
-			id = 9863526644
-		}, 
-		combat = {
-			id = 9863526644
-		}
-	}, 
-	sanctuaryinside = {
-		ambient = {
-			id = 9360784208
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	castle = {
-		ambient = {
-			id = 11435572663
-		}, 
-		combat = {
-			id = 6435543635
-		}
-	}, 
-	Nothing = {
-		ambient = {
-			id = 0
-		}, 
-		combat = {
-			id = 0
-		}
-	}, 
-	layer2 = {
-		ambient = {
-			id = 9558324744
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	erisia = {
-		ambient = {
-			id = 7632923661
-		}, 
-		combat = {
-			id = 8304198610
-		}
-	}, 
-	lava = {
-		ambient = {
-			id = 10576406481
-		}, 
-		combat = {
-			id = 7978914715
-		}
-	}, 
-	kyrsa = {
-		ambient = {
-			id = 12115948047
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	kyrsatrain = {
-		ambient = {
-			id = 12115948047
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	kyrsalibrary = {
-		ambient = {
-			id = 12115948047
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	sanctuaryoutside = {
-		ambient = {
-			id = 10511015615
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	depths = {
-		ambient = {
-			id = 4657617399
-		}, 
-		combat = {
-			id = 4657617829
-		}
-	}, 
-	sailing = {
-		ambient = {
-			id = 4649072374
-		}, 
-		combat = {
-			id = 4649079311
-		}
-	}, 
-	cave = {
-		ambient = {
-			id = 4745345282
-		}, 
-		combat = {
-			id = 4745356593
-		}
-	}, 
-	specialcave = {
-		ambient = {
-			id = 4745345282
-		}, 
-		combat = {
-			id = 10408993807
-		}
-	}, 
-	mountain = {
-		ambient = {
-			id = 4863842872
-		}, 
-		combat = {
-			id = 4863844566
-		}
-	}, 
-	jungle = {
-		ambient = {
-			id = 6022579794
-		}, 
-		combat = {
-			id = 6022578843
-		}
-	}, 
-	desert = {
-		ambient = {
-			id = 8207455512
-		}, 
-		combat = {
-			id = 8276751712
-		}
-	}, 
-	temple = {
-		ambient = {
-			id = 5019613268
-		}, 
-		combat = {
-			id = 7189081937
-		}
-	}, 
-	manor = {
-		ambient = {
-			id = 5990454765
-		}
-	}, 
-	manor_lab = {
-		ambient = {
-			id = 6066767800
-		}
-	}, 
-	chaser = {
-		ambient = {
-			id = 6066767800
-		}, 
-		combat = {
-			id = 11637936960
-		}
-	}, 
-	hive = {
-		ambient = {
-			id = 6246012947
-		}, 
-		combat = {
-			id = 6435543635
-		}
-	}, 
-	summer = {
-		ambient = {
-			id = 6668751588
-		}, 
-		combat = {
-			id = 7978914715
-		}
-	}, 
-	town = {
-		ambient = {
-			id = 6970325515
-		}
-	}, 
-	ferryman = {
-		ambient = {
-			id = 5995252439
-		}
-	}, 
-	ferryman2 = {
-		ambient = {
-			id = 6197158574
-		}
-	}, 
-	primadon = {
-		ambient = {
-			id = 6435543635
-		}
-	}, 
-	fragment = {
-		ambient = {
-			id = 6677358684
-		}
-	}, 
-	voidsea = {
-		ambient = {
-			id = 7085013640
-		}
-	}
+local ambientsReference = {
+	forest = 7143662033,
+	snow = 8295196681,
+	siege = 9863526644,
+	sanctuaryinside = 9360784208,
+	castle = 11435572663,
+	layer2 = 9558324744,
+	erisia = 7632923661,
+	lava = 10576406481,
+	kyrsa = 12115948047,
+	kyrsatrain = 12115948047,
+	kyrsalibrary = 12115948047,
+	sanctuaryoutside = 10511015615,
+	depths = 4657617399,
+	sailing = 4649072374,
+	cave = 4745345282,
+	specialcave = 4745345282,
+	mountain = 4863842872,
+	jungle = 6022579794,
+	desert = 8207455512,
+	temple = 5019613268,
+	manor = 5990454765,
+	manor_lab = 6066767800,
+	chaser = 6066767800,
+	hive = 6246012947,
+	summer = 6668751588,
+	town = 6970325515,
+	ferryman = 5995252439,
+	ferryman2 = 6197158574,
+	primadon = 6435543635,
+	fragment = 6677358684,
+	voidsea = 7085013640
 }
 local ambients = {
 	forest = {
@@ -753,8 +552,8 @@ local function getArea()
 	local tracks = worldClient:WaitForChild("Tracks", math.huge)
 	local tracksAmbient = tracks:WaitForChild("Ambient", math.huge)
 	
-	for i,v in pairs(ORIGINAL) do
-		if v.ambient.id == tonumber(tracksAmbient.SoundId:sub(14,#tracksAmbient.SoundId)) then
+	for i,v in pairs(ambientsReference) do
+		if v == tonumber(tracksAmbient.SoundId:sub(14,#tracksAmbient.SoundId)) then
 			return i
 		end
 	end
