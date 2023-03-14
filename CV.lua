@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.8'
+local ver = 'v0.7.9'
 
 local messageCache = {}
 local activeMessages = {}
@@ -738,7 +738,7 @@ local function isInDanger()
 end
 
 local function getChance(x)
-	local valid = (os.clock() - lastCheckedChance) > 1
+	local valid = (os.clock() - lastCheckedChance) > 10
 	if valid then
 		lastCheckedChance = os.clock()
 	end
