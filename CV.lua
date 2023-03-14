@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.2'
+local ver = 'v0.7.3'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1413,7 +1413,7 @@ local function updateAmbient()
 				ambient:Resume()
 			end
 		end
-		if not special.IsPlaying and special and getChance(area.special.chance) then
+		if special and not special.IsPlaying and getChance(area.special.chance) then
 			if ambient.IsPlaying then
 				lastTimePos.ambient = ambient.TimePosition
 				local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
@@ -1454,7 +1454,7 @@ local function updateAmbient()
 		elseif shouldTweenWhat == 2 then
 			tweenService:Create(special, tweenInfo, {Volume = specialVolume}):Play()
 		else
-			if not special.IsPlaying then
+			if not special or not special.IsPlaying then
 				ambient.Volume = ambientVolume
 			else
 				special.Volume = specialVolume
