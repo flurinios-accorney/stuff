@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.0'
+local ver = 'v0.7.1'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1441,7 +1441,7 @@ local function updateAmbient()
 	else
 		if shouldTweenWhat == 0 then
 			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
-		elseif shouldTweenWhat = 2 then
+		elseif shouldTweenWhat == 2 then
 			tweenService:Create(special, tweenInfo, {Volume = specialVolume}):Play()
 		else
 			if not special.IsPlaying then
