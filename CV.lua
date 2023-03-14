@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.11'
+local ver = 'v0.7.12'
 
 local messageCache = {}
 local activeMessages = {}
@@ -234,10 +234,14 @@ local ambients = {
 		}
 	},
 	ferryman = {
-		ambient = {}
+		ambient = {
+			volume = 1
+		}
 	},
 	ferryman2 = {
-		ambient = {}
+		ambient = {
+			volume = 1
+		}
 	},
 	primadon = {
 		ambient = {
