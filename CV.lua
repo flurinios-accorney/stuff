@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.12'
+local ver = 'v0.7.13'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1132,7 +1132,7 @@ local function updateAmbient()
 	local shouldTweenWhat = -1
 	
 	-- new
-	if not combat or combat.SoundId ~= area.combat.id and isCombat then		
+	if not combat or combat.SoundId ~= area.combat.id and isCombat then
 		if combat then
 			task.spawn(clearOldSound, combat)
 		end
@@ -1147,7 +1147,7 @@ local function updateAmbient()
 		newCombat.SoundId = area.combat.id
 		combat = newCombat
 	end
-	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then		
+	if not ambient or ambient.SoundId ~= area.ambient.id and not isCombat then
 		if ambient then
 			task.spawn(clearOldSound, ambient)
 		end
@@ -1179,7 +1179,7 @@ local function updateAmbient()
 	end
 	
 	-- play - stop
-	if isCombat then
+	if isCombat and combat.SoundId ~= ambient.SoundId then
 		if not combat.IsPlaying then
 			if special then
 				lastTimePos.special = special.TimePosition
@@ -1251,7 +1251,7 @@ local function updateAmbient()
 		specialVolume = PlayCustomAmbient.Value and area.special.volume * Options.AmbientVolume.Value or 0
 	end
 	
-	if isCombat then
+	if isCombat and combat.SoundId ~= ambient.SoundId then
 		if shouldTweenWhat == 1 then
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
