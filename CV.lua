@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.13'
+local ver = 'v0.7.14'
 
 local messageCache = {}
 local activeMessages = {}
@@ -442,12 +442,11 @@ local function downloadVersion()
 end
 
 local function preloadAmbients()
-	Library:Notify("Preloading ambients..", 3)
-	
 	if not isfolder("CustomMusic") then
 		makefolder("CustomMusic")
 	end
 	
+	Library:Notify("Checking for updates..", 3)
 	local localVersion = isfile("CustomMusic/Version.json") and httpService:JSONDecode(readfile("CustomMusic/Version.json")).version or nil
 	local succ, file = getVersion()
 	if not succ then
@@ -473,7 +472,7 @@ local function preloadAmbients()
 		end
 	end
 	
-	
+	Library:Notify("Preloading ambients..", 3)
 	for i,v in pairs(ambients) do
 		-- ambient
 		local nameAmbient = i..".ambient.mp3"
