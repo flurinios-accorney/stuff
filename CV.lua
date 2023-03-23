@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.14'
+local ver = 'v0.7.15'
 
 local messageCache = {}
 local activeMessages = {}
@@ -927,6 +927,7 @@ local SendMessages = Webhooks:AddButton('Export messages', function()
 	local success, body = exportWithHook()
 	if not success then
 		Library:Notify("[ERROR] Failed to export saved messages", 7)
+		printconsole(body,225,225,0)
 		return
 	end
 	Library:Notify("[Done!] Successfully exported saved messages", 5)
