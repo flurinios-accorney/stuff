@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.15'
+local ver = 'v0.7.16'
 
 local messageCache = {}
 local activeMessages = {}
@@ -684,56 +684,36 @@ local function exportWithHook()
 		return false, "No messages saved"
 	end
 	
-	local data = {
-		["username"] = "Logs Export",
-		["content"] = "",
-		["embeds"] = {{
-			["title"] = "***Saved Messages `Page #1`***",
-			["description"] = "",
-			["type"] = "rich",
-			["color"] = rgbToInt(255, 225, 0),
-			["fields"] = {},
-			["timestamp"] = DateTime.now():ToIsoDate()
-		}}
-	}
-	
-	-- page 2
-	if #messageCache > 25 then
-		local newEmbed = {
-			["title"] = "***Saved Messages `Page #2`***",
-			["description"] = "",
-			["type"] = "rich",
-			["color"] = rgbToInt(255, 225, 0),
-			["fields"] = {},
-			["timestamp"] = DateTime.now():ToIsoDate()
+	local function sendHook(fields, page)
+		local data = {
+			["username"] = "Logs Export",
+			["content"] = "",
+			["embeds"] = {{
+				["title"] = "***Saved Messages `Page #"..tostring(page).."`***",
+				["description"] = "",
+				["type"] = "rich",
+				["color"] = rgbToInt(255, 225, 0),
+				["fields"] = fields,
+				["timestamp"] = DateTime.now():ToIsoDate()
+			}}
 		}
-		table.insert(data.embeds, newEmbed)
-	end
-	-- page 3
-	if #messageCache > 50 then
-		local newEmbed = {
-			["title"] = "***Saved Messages `Page #3`***",
-			["description"] = "",
-			["type"] = "rich",
-			["color"] = rgbToInt(255, 225, 0),
-			["fields"] = {},
-			["timestamp"] = DateTime.now():ToIsoDate()
-		}
-		table.insert(data.embeds, newEmbed)
-	end
-	-- page 4
-	if #messageCache > 75 then
-		local newEmbed = {
-			["title"] = "***Saved Messages `Page #4`***",
-			["description"] = "",
-			["type"] = "rich",
-			["color"] = rgbToInt(255, 225, 0),
-			["fields"] = {},
-			["timestamp"] = DateTime.now():ToIsoDate()
-		}
-		table.insert(data.embeds, newEmbed)
+		
+		local encoded = httpService:JSONEncode(data)
+		local response = syn.request(
+			{
+				Url = Options.WebhookUrl.Value,
+				Method = 'POST',
+				Headers = {
+					['Content-Type'] = 'application/json'
+				},
+				Body = encoded
+			}
+		)
+		return response.Success, not response.Success and response.Body or ''
 	end
 	
+	local fields = {}
+	local page = 1
 	for index,value in pairs(messageCache) do
 		local dateNow = os.date('%c', value.Timestamp)
 		local name = "[**"..value.Player.Name.."**]" .. " " .. "[**"..value.Player.CharName.."**]" .. " " .. "[**"..value.Player.UserId.."**]"
@@ -741,37 +721,24 @@ local function exportWithHook()
 		
 		local newTable = {
 			["name"] = name,
-			["value"] = text,
+			["value"] = text:sub(1,200),
 			["inline"] = false
 		}
 		
-		if #data.embeds[1].fields < 25 then
-			-- page 1
-			table.insert(data.embeds[1].fields, newTable)
-		elseif #data.embeds[1].fields == 25 and #data.embeds[2].fields < 25 then
-			-- page 2
-			table.insert(data.embeds[2].fields, newTable)
-		elseif #data.embeds[2].fields == 25 and #data.embeds[3].fields < 25 then
-			-- page 3
-			table.insert(data.embeds[3].fields, newTable)
-		elseif #data.embeds[3].fields == 25 and #data.embeds[4].fields < 25 then
-			-- page 4
-			table.insert(data.embeds[4].fields, newTable)
+		table.insert(fields, newTable)
+		
+		if #fields > 24 then
+			local response = sendHook(fields, page)
+			if not response.Success then
+				return false, response.Body
+			end
+			
+			fields = {}
+			page = page + 1
 		end
 	end
 	
-	local encoded = httpService:JSONEncode(data)
-	local response = syn.request(
-		{
-			Url = Options.WebhookUrl.Value,
-			Method = 'POST',
-			Headers = {
-				['Content-Type'] = 'application/json'
-			},
-			Body = encoded
-		}
-	)
-	return response.Success, not response.Success and response.Body or ''
+	return true, ''
 end
 
 local function lowerAllOldMessages(removedIndex)
