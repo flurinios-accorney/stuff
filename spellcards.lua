@@ -37,7 +37,7 @@ local lastSpell
 local registered = {}
 local elementColors = {
 	Wind = Color3.fromRGB(0,255,0),
-	Frost = Color3.fromRGB(0,255,255),
+	Ice = Color3.fromRGB(0,255,255),
 	Shadow = Color3.fromRGB(10,10,10),
 	Fire = Color3.fromRGB(255,80,0),
 	Thunder = Color3.fromRGB(255,255,0)
