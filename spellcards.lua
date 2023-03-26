@@ -64,6 +64,7 @@ local screenGui = Instance.new("ScreenGui")
 syn.protect_gui(screenGui)
 screenGui.Parent = coreGui
 screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 shared.SC_UI = screenGui
 
 
@@ -109,7 +110,7 @@ local function newSpellSign(text, element)
 
 	imageLabel.Parent = mainFrame
 	imageLabel.BackgroundTransparency = 1
-	imageLabel.Position = UDim2.new(0, -75, 1, -60)
+	imageLabel.Position = UDim2.new(0, -85, 1, -60)
 	imageLabel.Size = UDim2.new(0, 80, 0, 80)
 	imageLabel.Image = "rbxassetid://5304862649"
 	imageLabel.ImageColor3 = Color3.fromRGB(255,255,255)
@@ -119,11 +120,11 @@ local function newSpellSign(text, element)
 	
 	imageLabel2.Parent = mainFrame
 	imageLabel2.BackgroundTransparency = 1
-	imageLabel2.Position = UDim2.new(0, -90, 1, -75)
+	imageLabel2.Position = UDim2.new(0, -100, 1, -75)
 	imageLabel2.Size = UDim2.new(0, 110, 0, 110)
 	imageLabel2.Image = "rbxassetid://5304862649"
 	imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
-	imageLabel2.ImageTransparency = elementColors[element] and .5 or 1
+	imageLabel2.ImageTransparency = .5
 	imageLabel2.ScaleType = Enum.ScaleType.Crop
 
 	textLabel.Parent = mainFrame
@@ -172,7 +173,7 @@ local function newMove(move)
 		while ui.imageLabel and ui.imageLabel2 do
 			task.wait(.23)
 			local spinTween = tweenService:Create(ui.imageLabel, tweenInfoSpin, {Rotation = ui.imageLabel.Rotation + 20})
-			local spin2Tween = tweenService:Create(ui.imageLabel2, tweenInfoSpin, {Rotation = ui.imageLabel.Rotation + 20})
+			local spin2Tween = tweenService:Create(ui.imageLabel2, tweenInfoSpin, {Rotation = -ui.imageLabel.Rotation - 20})
 			spinTween:Play()
 			spin2Tween:Play()
 		end
