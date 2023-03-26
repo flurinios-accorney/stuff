@@ -45,7 +45,8 @@ local elementColors = {
 local customTypes = {
 	Dash = "Mobility",
 	Reinforce = "Fortitude",
-	Taunt = "Charismatic"
+	Taunt = "Charismatic",
+	["Exhaustion Strike"] = "Willpower"
 }
 
 -- ui
