@@ -40,14 +40,16 @@ local elementColors = {
 	Ice = Color3.fromRGB(0,255,255),
 	Shadow = Color3.fromRGB(10,10,10),
 	Fire = Color3.fromRGB(255,80,0),
-	Thunder = Color3.fromRGB(255,255,0)
+	Lightning = Color3.fromRGB(255,255,0)
 }
 local customTypes = {
 	Dash = "Mobility",
 	Reinforce = "Fortitude",
 	Taunt = "Charismatic",
 	["Exhaustion Strike"] = "Willpower",
-	["Rapid Slashes"] = "Weapon Art"
+	["Rapid Slashes"] = "Weapon Art",
+	["StrongPunch"] = "Destructive",
+	["Master's Flourish"] = "Weapon Art"
 }
 
 -- ui
