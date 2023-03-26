@@ -12,6 +12,12 @@ if game.CreatorId ~= 5212858 then
 if shared.SC_UI then
 	shared.SC_UI:Destroy()
 end
+if shared.SC_charAdd then
+	shared.SC_charAdd:Disconnect()
+end
+if shared.SC_backpackAdd then
+	shared.SC_backpackAdd:Disconnect()
+end
 if shared.SC_tools then
 	for i,c in pairs(shared.SC_tools) do
 		pcall(function() shared.SC_tools[i]:Disconnect() end)
@@ -251,7 +257,23 @@ local function checkTool(tool)
 	end
 end
 
+local charAdd
+charAdd = player.CharacterAdded:Connect(function()
+	registered = {}
+	backpack = player:WaitForChild("Backpack", math.huge) or player.Backpack:Wait()
+	
+	if shared.SC_backpackAdd then
+		shared.SC_backpackAdd:Disconnect()
+	end
+	local backpackAdd
+	backpackAdd = backpack.ChildAdded:Connect(checkTool)
+	shared.SC_backpackAdd = backpackAdd
+end)
+shared.SC_charAdd = charAdd
+
 for i,t in pairs(backpack:GetChildren()) do
 	checkTool(t)
 end
-backpack.ChildAdded:Connect(checkTool)
+local backpackAdd
+backpackAdd = backpack.ChildAdded:Connect(checkTool)
+shared.SC_backpackAdd = backpackAdd
