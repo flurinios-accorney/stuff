@@ -46,7 +46,8 @@ local customTypes = {
 	Dash = "Mobility",
 	Reinforce = "Fortitude",
 	Taunt = "Charismatic",
-	["Exhaustion Strike"] = "Willpower"
+	["Exhaustion Strike"] = "Willpower",
+	["Rapid Slashes"] = "Weapon Art"
 }
 
 -- ui
