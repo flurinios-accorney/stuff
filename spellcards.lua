@@ -40,7 +40,8 @@ local elementColors = {
 	Ice = Color3.fromRGB(0,255,255),
 	Shadow = Color3.fromRGB(10,10,10),
 	Fire = Color3.fromRGB(255,80,0),
-	Lightning = Color3.fromRGB(255,255,0)
+	Lightning = Color3.fromRGB(255,255,0),
+	Radiant = Color3.fromRGB(255,255,255)
 }
 local customTypes = {
 	Dash = "Mobility",
@@ -152,11 +153,14 @@ local function newMove(move)
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoImageColor = TweenInfo.new(.6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local tweenInfoRadiantColor = TweenInfo.new(.05, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoMid = TweenInfo.new(.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoFinal = TweenInfo.new(.35, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoExit = TweenInfo.new(1.4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoSpin = TweenInfo.new(.25, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoFade = TweenInfo.new(.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+
+	local fadeTweenPlaying = false
 
 	task.spawn(function()
 		while ui.imageLabel and ui.imageLabel2 do
@@ -167,6 +171,19 @@ local function newMove(move)
 			spin2Tween:Play()
 		end
 	end)
+	if move.Type == "Radiant" then
+		task.spawn(function()
+			local t = .6
+			local r = math.random() * t
+			while not fadeTweenPlaying and ui.imageLabel2 do
+				task.wait()
+				local hue = (tick()+r) % t / t
+				local color = Color3.fromHSV(hue, 1, 1)
+				local colorTween = tweenService:Create(ui.imageLabel2, tweenInfoRadiantColor, {ImageColor3 = color})
+				colorTween:Play()
+			end
+		end)
+	end
 	
 	local scaleTween = tweenService:Create(ui.scale, tweenInfoScale, {Scale = 1})
 	local scaleExitTween = tweenService:Create(ui.scale, tweenInfoScaleExit, {Scale = 1.2})
@@ -201,6 +218,7 @@ local function newMove(move)
 	image2ColorTween:Play()
 	fadeTweenImage:Play()
 	fadeTweenImage2:Play()
+	fadeTweenPlaying = true
 	fadeTweenText:Play()
 	fadeTweenTextStroke:Play()
 	fadeTweenLine:Play()
