@@ -56,7 +56,8 @@ local customTypes = {
 	["Exhaustion Strike"] = "Willpower",
 	["Rapid Slashes"] = "Weapon Art",
 	["StrongPunch"] = "Destructive",
-	["Master's Flourish"] = "Weapon Art"
+	["Master's Flourish"] = "Weapon Art",
+	QuickDraw = "Weapon Art"
 }
 
 -- ui
