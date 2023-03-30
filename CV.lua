@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.16'
+local ver = 'v0.7.18'
 
 local messageCache = {}
 local activeMessages = {}
@@ -76,9 +76,18 @@ local ambientsReference = {
 	ferryman2 = 6197158574,
 	primadon = 6435543635,
 	fragment = 6677358684,
-	voidsea = 7085013640
+	voidsea = 7085013640,
+	duke = 9334052363
 }
 local ambients = {
+	duke = {
+		ambient = {
+			volume = 1.2
+		},
+		combat = {
+			volume = 1.2
+		}
+	},
 	forest = {
 		ambient = {
 			volume = 0.55
@@ -853,7 +862,7 @@ end
 
 
 -- ui
-local Window = Library:CreateWindow('Chat Visualizer | '..ver)
+local Window = Library:CreateWindow('Hub | '..ver)
 --Window.Holder.Visible = true
 
 local Tabs = {
