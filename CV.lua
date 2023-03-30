@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.20'
+local ver = 'v0.7.21'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1114,7 +1114,7 @@ local function updateAmbient()
 	end
 	
 	-- new
-	if not combat or combat.SoundId ~= area.combat.id and isCombat or ferryman and ferryman:WaitForChild("Humanoid").Health <= (ferryman:WaitForChild("Humanoid").Health / 2) then
+	if not combat or combat.SoundId ~= area.combat.id and isCombat then
 		if combat then
 			task.spawn(clearOldSound, combat)
 		end
@@ -1161,7 +1161,7 @@ local function updateAmbient()
 	end
 	
 	-- play - stop
-	if isCombat and combat.SoundId ~= ambient.SoundId or ferryman and ferryman:WaitForChild("Humanoid").Health <= (ferryman:WaitForChild("Humanoid").Health / 2) then
+	if isCombat and combat.SoundId ~= ambient.SoundId and not ferryman or ferryman and ferryman:WaitForChild("Humanoid").Health <= (ferryman:WaitForChild("Humanoid").Health / 2) and isCombat then
 		if not combat.IsPlaying then
 			if special then
 				lastTimePos.special = special.TimePosition
@@ -1233,7 +1233,7 @@ local function updateAmbient()
 		specialVolume = PlayCustomAmbient.Value and area.special.volume * Options.AmbientVolume.Value or 0
 	end
 	
-	if isCombat and combat.SoundId ~= ambient.SoundId or ferryman and ferryman:WaitForChild("Humanoid").Health <= (ferryman:WaitForChild("Humanoid").Health / 2) then
+	if isCombat and combat.SoundId ~= ambient.SoundId and not ferryman or ferryman and ferryman:WaitForChild("Humanoid").Health <= (ferryman:WaitForChild("Humanoid").Health / 2) and isCombat then
 		if shouldTweenWhat == 1 then
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
