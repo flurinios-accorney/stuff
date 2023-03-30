@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.23'
+local ver = 'v0.7.24'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1093,7 +1093,7 @@ local function updateAmbient()
 		return
 	end
 	
-	if not player.Character then
+	if not localPlayer.Character then
 		if combat then
 			task.spawn(clearOldSound, combat)
 			combat = nil
