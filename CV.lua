@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.22'
+local ver = 'v0.7.23'
 
 local messageCache = {}
 local activeMessages = {}
@@ -50,7 +50,7 @@ local ambientsReference = {
 	snow = 8295196681,
 	siege = 9863526644,
 	sanctuaryinside = 9360784208,
-	castle = 11435572663,
+	--castle = 11435572663,
 	layer2 = 9558324744,
 	erisia = 7632923661,
 	lava = 10576406481,
@@ -108,12 +108,6 @@ local ambients = {
 		},
 		combat = {}
 	},
-	--[[castle = {
-		ambient = {
-			volume = 0.7
-		},
-		combat = {}
-	},]]
 	layer2 = {
 		ambient = {},
 		combat = {
@@ -540,8 +534,8 @@ local function preloadAmbients()
 end
 
 local function isInDanger()
-	local statsGui = playerGui:WaitForChild("StatsGui",math.huge)
-	local danger = statsGui:WaitForChild("Danger",math.huge)
+	local statsGui = playerGui:WaitForChild("StatsGui", math.huge)
+	local danger = statsGui:WaitForChild("Danger", math.huge)
 	return danger.Visible
 end
 
@@ -1099,17 +1093,36 @@ local function updateAmbient()
 		return
 	end
 	
+	if not player.Character then
+		if combat then
+			task.spawn(clearOldSound, combat)
+			combat = nil
+			lastTimePos.combat = 0
+		end
+		if ambient then
+			task.spawn(clearOldSound, ambient)
+			ambient = nil
+			lastTimePos.ambient = 0
+		end
+		if special then
+			task.spawn(clearOldSound, special)
+			special = nil
+			lastTimePos.special = 0
+		end
+		return
+	end
+	
 	local isCombat = isInDanger()
 	
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local shouldTweenWhat = -1
 	
-	local ferrymanHealth, maxHealth
+	local ferrymanHealth, ferrymanMaxHealth
 	if area.name == "ferryman" then
-		for i,c in pairs(workspace:WaitForChild("Live"):GetChildren()) do
+		for i,c in pairs(workspace:WaitForChild("Live", math.huge):GetChildren()) do
 			if c:FindFirstChild("FerrymanController") then
-				ferrymanHealth = c:WaitForChild("Humanoid").Health
-				maxHealth = c:WaitForChild("Humanoid").MaxHealth
+				ferrymanHealth = c:WaitForChild("Humanoid", math.huge).Health
+				ferrymanMaxHealth = c:WaitForChild("Humanoid", math.huge).MaxHealth
 			end
 		end
 	end
@@ -1162,12 +1175,8 @@ local function updateAmbient()
 	end
 	
 	-- play - stop
-	if isCombat and combat.SoundId ~= ambient.SoundId and not ferrymanHealth or ferrymanHealth and ferrymanHealth <= (maxHealth / 2) then
+	if isCombat and combat.SoundId ~= ambient.SoundId and not ferrymanHealth or ferrymanHealth and ferrymanHealth <= (ferrymanMaxHealth / 2) then
 		if not combat.IsPlaying then
-			if ferrymanHealth then
-				printconsole("phase 2",255,255,255)
-			end
-			
 			if special then
 				lastTimePos.special = special.TimePosition
 				local tween = tweenService:Create(special, tweenInfo, {Volume = 0})
@@ -1188,12 +1197,8 @@ local function updateAmbient()
 			combat.Volume = 0
 			combat:Resume()
 		end
-	elseif combat.SoundId == ambient.SoundId and not ferrymanHealth or not isCombat and not ferrymanHealth or ferrymanHealth and ferrymanHealth > (maxHealth / 2) then
+	elseif combat.SoundId == ambient.SoundId and not ferrymanHealth or not isCombat and not ferrymanHealth or ferrymanHealth and ferrymanHealth > (ferrymanMaxHealth / 2) then
 		if not ambient.IsPlaying then
-			if ferrymanHealth then
-				printconsole("phase 1",255,255,255)
-			end
-			
 			if not special or not special.IsPlaying then
 				lastTimePos.combat = combat.TimePosition
 				local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
@@ -1242,13 +1247,13 @@ local function updateAmbient()
 		specialVolume = PlayCustomAmbient.Value and area.special.volume * Options.AmbientVolume.Value or 0
 	end
 	
-	if isCombat and combat.SoundId ~= ambient.SoundId and not ferrymanHealth or ferrymanHealth and ferrymanHealth <= (maxHealth / 2) then
+	if isCombat and combat.SoundId ~= ambient.SoundId and not ferrymanHealth or ferrymanHealth and ferrymanHealth <= (ferrymanMaxHealth / 2) then
 		if shouldTweenWhat == 1 then
 			tweenService:Create(combat, tweenInfo, {Volume = combatVolume}):Play()
 		else
 			combat.Volume = combatVolume
 		end
-	elseif combat.SoundId == ambient.SoundId and not ferrymanHealth or not isCombat and not ferrymanHealth or ferrymanHealth and ferrymanHealth > (maxHealth / 2) then
+	elseif combat.SoundId == ambient.SoundId and not ferrymanHealth or not isCombat and not ferrymanHealth or ferrymanHealth and ferrymanHealth > (ferrymanMaxHealth / 2) then
 		if shouldTweenWhat == 0 then
 			tweenService:Create(ambient, tweenInfo, {Volume = ambientVolume}):Play()
 		elseif shouldTweenWhat == 2 then
