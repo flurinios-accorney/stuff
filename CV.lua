@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.25'
+local ver = 'v0.7.26'
 
 local messageCache = {}
 local activeMessages = {}
@@ -84,7 +84,8 @@ local ambients = {
 			volume = 0.9
 		},
 		combat = {
-			volume = 0.9
+			volume = 0.9,
+			begin = 11
 		}
 	},
 	forest = {
@@ -1130,7 +1131,7 @@ local function updateAmbient()
 			task.spawn(clearOldSound, combat)
 		end
 		
-		lastTimePos.combat = 0
+		lastTimePos.combat = area.combat.begin and area.combat.begin or 0
 		
 		local newCombat = Instance.new("Sound")
 		newCombat.Name = "Combat"
@@ -1145,7 +1146,7 @@ local function updateAmbient()
 			task.spawn(clearOldSound, ambient)
 		end
 		
-		lastTimePos.ambient = 0
+		lastTimePos.ambient = area.ambient.begin and area.ambient.begin or 0
 		
 		local newAmbient = Instance.new("Sound")
 		newAmbient.Name = "Ambient"
@@ -1160,7 +1161,7 @@ local function updateAmbient()
 			task.spawn(clearOldSound, special)
 		end
 		
-		lastTimePos.special = 0
+		lastTimePos.special = area.special.begin and area.special.begin or 0
 		
 		local newSpecial = Instance.new("Sound")
 		newSpecial.Name = "Special"
@@ -1181,7 +1182,7 @@ local function updateAmbient()
 	-- play - stop
 	if shouldPlayCombat() then
 		if not combat.IsPlaying then
-			if special then
+			if special and special.IsPlaying then
 				lastTimePos.special = special.TimePosition
 				local tween = tweenService:Create(special, tweenInfo, {Volume = 0})
 				tween.Completed:Connect(function(playbackState)
@@ -1189,12 +1190,14 @@ local function updateAmbient()
 				end)
 				tween:Play()
 			end
-			lastTimePos.ambient = ambient.TimePosition
-			local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
-			tween.Completed:Connect(function(playbackState)
-				ambient:Pause()
-			end)
-			tween:Play()
+			if ambient.IsPlaying then
+				lastTimePos.ambient = ambient.TimePosition
+				local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
+				tween.Completed:Connect(function(playbackState)
+					ambient:Pause()
+				end)
+				tween:Play()
+			end
 			
 			shouldTweenWhat = 1
 			combat.TimePosition = lastTimePos.combat
@@ -1204,12 +1207,14 @@ local function updateAmbient()
 	else
 		if not ambient.IsPlaying then
 			if not special or not special.IsPlaying then
-				lastTimePos.combat = combat.TimePosition
-				local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
-				tween.Completed:Connect(function(playbackState)
-					combat:Pause()
-				end)
-				tween:Play()
+				if combat.IsPlaying then
+					lastTimePos.combat = combat.TimePosition
+					local tween = tweenService:Create(combat, tweenInfo, {Volume = 0})
+					tween.Completed:Connect(function(playbackState)
+						combat:Pause()
+					end)
+					tween:Play()
+				end
 				
 				shouldTweenWhat = 0
 				ambient.TimePosition = lastTimePos.ambient
@@ -1219,7 +1224,7 @@ local function updateAmbient()
 		end
 		if special and not special.IsPlaying and getChance(area.special.chance) then
 			if ambient.IsPlaying then
-				lastTimePos.special = 0
+				lastTimePos.special = area.special.begin and area.special.begin or 0
 				lastTimePos.ambient = ambient.TimePosition
 				local tween = tweenService:Create(ambient, tweenInfo, {Volume = 0})
 				tween.Completed:Connect(function(playbackState)
