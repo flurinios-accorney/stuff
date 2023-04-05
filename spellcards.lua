@@ -198,7 +198,7 @@ local function newMove(move)
 		end)
 	elseif move.Type == "Tacet" then
 		task.spawn(function()
-			while ui.imageLabel2 do
+			while not fadeTweenPlaying and ui.imageLabel2 do
 				local transparency = ui.imageLabel2.ImageTransparency == 0 and .95 or 0
 				local murmurTween = tweenService:Create(ui.imageLabel2, tweenInfoMurmur, {ImageTransparency = transparency})
 				murmurTween:Play()
