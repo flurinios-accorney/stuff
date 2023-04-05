@@ -227,20 +227,21 @@ local function newMove(move)
 		task.wait(.05)
 		finalTween:Play()
 	end)
-	midTween:Play()
-	scaleTween:Play()
-
-	task.wait(3)
 	fadeTweenLine.Completed:Connect(function(playbackState)
 		task.wait(.1)
 		ui.mainFrame:Destroy()
 	end)
+	
+	midTween:Play()
+	scaleTween:Play()
+
+	task.wait(3)
+	fadeTweenPlaying = true
 	scaleExitTween:Play()
 	imageColorTween:Play()
 	image2ColorTween:Play()
 	fadeTweenImage:Play()
 	fadeTweenImage2:Play()
-	fadeTweenPlaying = true
 	fadeTweenText:Play()
 	fadeTweenLine:Play()
 	exitTween:Play()
