@@ -59,6 +59,9 @@ local customTypes = {
 	["Master's Flourish"] = "Weapon Art",
 	QuickDraw = "Weapon Art"
 }
+local customNames = {
+	["Tacet Drop Kick"] = {Type = "Murmur", Name = "Drop Kick"}
+}
 
 -- ui
 local screenGui = Instance.new("ScreenGui")
@@ -245,13 +248,19 @@ local function checkTool(tool)
 				Type = customTypes[Type]
 				custom = true
 			end
-			
+
 			local con
 			con = tool.Equipped:Connect(function()
 				local str = tool.Name
 				local start_idx = string.find(str, "{{") + 2
 				local end_idx = string.find(str, "}}") - 1
 				local final_str = string.sub(str, start_idx, end_idx)
+				
+				if customNames[final_str] then
+					Type = customNames[final_str].Type
+					final_str = customNames[final_str].Name
+				end
+				
 				newMove({Type = Type, Name = final_str, Custom = custom})
 			end)
 			shared.SC_tools[tool.Name] = con
