@@ -60,7 +60,7 @@ local customTypes = {
 	QuickDraw = "Weapon Art"
 }
 local customNames = {
-	["Tacet Drop Kick"] = {Type = "Murmur", Name = "Drop Kick"}
+	["Tacet Drop Kick"] = {Type = "Tacet", Name = "Drop Kick"}
 }
 
 -- ui
