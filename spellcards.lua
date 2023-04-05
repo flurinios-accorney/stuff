@@ -198,12 +198,12 @@ local function newMove(move)
 				task.wait()
 			end
 		elseif move.Type == "Tacet" then
-			local tweenInfoMurmur = TweenInfo.new(.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+			local tweenInfoMurmur = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 			while not fadeTweenPlaying and ui.imageLabel2 do
 				local transparency = ui.imageLabel2.ImageTransparency == 0 and .95 or 0
 				local murmurTween = tweenService:Create(ui.imageLabel2, tweenInfoMurmur, {ImageTransparency = transparency})
 				murmurTween:Play()
-				task.wait(.6)
+				task.wait(.4)
 			end
 		end
 	end)
