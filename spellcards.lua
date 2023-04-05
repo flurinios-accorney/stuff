@@ -161,21 +161,22 @@ local function newMove(move)
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type)
 	lastSpell = ui
+	
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	
 	local tweenInfoImageColor = TweenInfo.new(.6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	local tweenInfoRadiantColor = TweenInfo.new(.05, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	
 	local tweenInfoMid = TweenInfo.new(.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoFinal = TweenInfo.new(.35, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoExit = TweenInfo.new(1.4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoSpin = TweenInfo.new(.25, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoFade = TweenInfo.new(.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	
-	local tweenInfoMurmur = TweenInfo.new(.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 
 	local fadeTweenPlaying = false
 
 	task.spawn(function()
+		local tweenInfoSpin = TweenInfo.new(.25, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 		while ui.imageLabel and ui.imageLabel2 do
 			local spinTween = tweenService:Create(ui.imageLabel, tweenInfoSpin, {Rotation = ui.imageLabel.Rotation + 20})
 			local spin2Tween = tweenService:Create(ui.imageLabel2, tweenInfoSpin, {Rotation = -ui.imageLabel.Rotation - 20})
@@ -184,28 +185,28 @@ local function newMove(move)
 			task.wait(.23)
 		end
 	end)
-	if move.Type == "Radiant" then
-		task.spawn(function()
+	task.spawn(function()
+		if move.Type == "Radiant" then
 			local t = .6
 			local r = math.random() * t
+			local tweenInfoRadiant = TweenInfo.new(.05, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 			while not fadeTweenPlaying and ui.imageLabel2 do
 				local hue = (tick()+r) % t / t
 				local color = Color3.fromHSV(hue, 1, 1)
-				local colorTween = tweenService:Create(ui.imageLabel2, tweenInfoRadiantColor, {ImageColor3 = color})
+				local colorTween = tweenService:Create(ui.imageLabel2, tweenInfoRadiant, {ImageColor3 = color})
 				colorTween:Play()
 				task.wait()
 			end
-		end)
-	elseif move.Type == "Tacet" then
-		task.spawn(function()
+		elseif move.Type == "Tacet" then
+			local tweenInfoMurmur = TweenInfo.new(.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 			while not fadeTweenPlaying and ui.imageLabel2 do
 				local transparency = ui.imageLabel2.ImageTransparency == 0 and .95 or 0
 				local murmurTween = tweenService:Create(ui.imageLabel2, tweenInfoMurmur, {ImageTransparency = transparency})
 				murmurTween:Play()
 				task.wait(.6)
 			end
-		end)
-	end
+		end
+	end)
 	
 	local scaleTween = tweenService:Create(ui.scale, tweenInfoScale, {Scale = 1})
 	local scaleExitTween = tweenService:Create(ui.scale, tweenInfoScaleExit, {Scale = 1.2})
@@ -219,8 +220,7 @@ local function newMove(move)
 
 	local fadeTweenImage = tweenService:Create(ui.imageLabel, tweenInfoFade, {ImageTransparency = 1})
 	local fadeTweenImage2 = tweenService:Create(ui.imageLabel2, tweenInfoFade, {ImageTransparency = 1})
-	local fadeTweenText = tweenService:Create(ui.textLabel, tweenInfoFade, {TextTransparency = 1})
-	local fadeTweenTextStroke = tweenService:Create(ui.textLabel, tweenInfoFade, {TextStrokeTransparency = 1})
+	local fadeTweenText = tweenService:Create(ui.textLabel, tweenInfoFade, {TextTransparency = 1, TextStrokeTransparency = 1})
 	local fadeTweenLine = tweenService:Create(ui.line, tweenInfoFade, {BackgroundTransparency = 1})
 
 	midTween.Completed:Connect(function(playbackState)
@@ -242,7 +242,6 @@ local function newMove(move)
 	fadeTweenImage2:Play()
 	fadeTweenPlaying = true
 	fadeTweenText:Play()
-	fadeTweenTextStroke:Play()
 	fadeTweenLine:Play()
 	exitTween:Play()
 end
