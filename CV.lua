@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.8.1'
+local ver = 'v0.8.2'
 
 local messageCache = {}
 local activeMessages = {}
@@ -736,6 +736,12 @@ local function exportWithHook()
 			
 			fields = {}
 			page = page + 1
+		end
+		if #messageCache == index and #fields > 0 then
+			local response = sendHook(fields, page)
+			if not response.Success then
+				return false, response.Body
+			end
 		end
 	end
 	
