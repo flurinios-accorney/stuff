@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.8.2'
+local ver = 'v0.8.3'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1320,18 +1320,19 @@ local function chatted(player, msg)
 			
 			local minlen = 3
 			
-			local minSize = 18
-			local maxSize = 22
+			local minSize = 17
+			local maxSize = 20
 			
 			local len = string.len(text)
-			local iHateYou = math.log(len, 1.7) + 16
+			local iHateYou = math.log(len, 1.7) + 15
 			local size = len > minlen and iHateYou or minSize
-			local clamped = size > maxSize and maxSize or size
+			local clampedMin = size < minSize and minSize or size
+			local clampedMax = clampedMin > maxSize and maxSize or clampedMin
 			
 			-- add instance to bottom left
 			local extra = {}
 			extra.index = getTotalOldMessages()+1
-			extra.size = OldMessagesLogaritmicSize.Value and clamped or Options.OldMessagesSize.Value
+			extra.size = OldMessagesLogaritmicSize.Value and clampedMax or Options.OldMessagesSize.Value
 			extra.delay = 8
 			task.spawn(newText, player, {label1 = name, label2 = text}, instance.frame, "OldInstances", extra)
 			
