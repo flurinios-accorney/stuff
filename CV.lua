@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.8.3'
+local ver = 'v0.8.4'
 
 local messageCache = {}
 local activeMessages = {}
@@ -729,18 +729,18 @@ local function exportWithHook()
 		table.insert(fields, newTable)
 		
 		if #fields > 24 then
-			local response = sendHook(fields, page)
-			if not response.Success then
-				return false, response.Body
+			local response, body = sendHook(fields, page)
+			if not response then
+				return false, body
 			end
 			
 			fields = {}
 			page = page + 1
 		end
 		if #messageCache == index and #fields > 0 then
-			local response = sendHook(fields, page)
-			if not response.Success then
-				return false, response.Body
+			local response, body = sendHook(fields, page)
+			if not response then
+				return false, body
 			end
 		end
 	end
