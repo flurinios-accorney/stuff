@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.8.4'
+local ver = 'v0.8.5'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1321,10 +1321,10 @@ local function chatted(player, msg)
 			local minlen = 3
 			
 			local minSize = 17
-			local maxSize = 20
+			local maxSize = 21
 			
 			local len = string.len(text)
-			local iHateYou = math.log(len, 1.7) + 15
+			local iHateYou = math.log(len, 1.7) + 16
 			local size = len > minlen and iHateYou or minSize
 			local clampedMin = size < minSize and minSize or size
 			local clampedMax = clampedMin > maxSize and maxSize or clampedMin
