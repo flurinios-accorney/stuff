@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.7.26'
+local ver = 'v0.8.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -880,6 +880,10 @@ local PlayCustomAmbient = Ambients:AddToggle('PlayCustomAmbient', {
 	Text = 'Play custom ambients',
 	Default = false
 })
+local OldMessagesLogaritmicSize = Toggles:AddToggle('OldMessagesLogaritmicSize', {
+	Text = 'Use logaritm messages size',
+	Default = false
+})
 
 local ClearMessages = Buttons:AddButton('Clear messages', function()
 	SaveManager:Save('Default')
@@ -962,6 +966,9 @@ ShowOldMessages:OnChanged(function()
 		ShowOldMessages:SetValue(false)
 	end
 	
+	SaveManager:Save('Default')
+end)
+OldMessagesLogaritmicSize:OnChanged(function()
 	SaveManager:Save('Default')
 end)
 Options.MessagesNearNameSize:OnChanged(function()
@@ -1305,16 +1312,20 @@ local function chatted(player, msg)
 			local name = "["..player.Name.."]["..characterName.."]: "
 			local text = instance.text.label2.Text
 			
+			local minlen = 3
 			
-			--[[ maybe
-			local fuck = msglen > 5 and msglen * .18 or 0
-			local finalSize = size + fuck <= maxSize and size + fuck or maxSize]]
+			local minSize = 18
+			local maxSize = 22
 			
+			local len = string.len(name..text)
+			local iHateYou = math.log(len, 1.7) + 16
+			local size = len > minlen and iHateYou or minSize
+			local clamped = size > maxSize and maxSize or size
 			
 			-- add instance to bottom left
 			local extra = {}
 			extra.index = getTotalOldMessages()+1
-			extra.size = Options.OldMessagesSize.Value
+			extra.size = OldMessagesLogaritmicSize.Value and clamped or Options.OldMessagesSize.Value
 			extra.delay = 8
 			task.spawn(newText, player, {label1 = name, label2 = text}, instance.frame, "OldInstances", extra)
 			
