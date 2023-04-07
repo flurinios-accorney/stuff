@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.9.1'
+local ver = 'v0.9.2'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1119,7 +1119,7 @@ local function updateDistances()
 		end
 		
 		local distance = (myRootPart.Position-rootPart.Position).Magnitude
-		activeMessages[player.UserId].Distance = tostring(distance)
+		activeMessages[player.UserId].Distance = tostring(math.floor(distance))
 	end
 end
 
