@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.9.2'
+local ver = 'v0.9.3'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1096,29 +1096,16 @@ local function updateDistances()
 	for index,value in pairs(activeMessages) do
 		local player = value.Player
 		
-		local myCharacter = localPlayer.Character
-		if not myCharacter then
-			activeMessages[player.UserId].Distance = "N/A"
-			return
-		end
-		local myRootPart = myCharacter:WaitForChild("HumanoidRootPart", math.huge)
-		if not myRootPart then
-			activeMessages[player.UserId].Distance = "N/A"
-			return
-		end
-		
 		local character = player.Character
 		if not character then
-			activeMessages[player.UserId].Distance = "N/A"
 			return
 		end
 		local rootPart = character:WaitForChild("HumanoidRootPart", math.huge)
 		if not rootPart then
-			activeMessages[player.UserId].Distance = "N/A"
 			return
 		end
 		
-		local distance = (myRootPart.Position-rootPart.Position).Magnitude
+		local distance = (workspace.CurrentCamera.CFrame.p-rootPart.Position).Magnitude
 		activeMessages[player.UserId].Distance = tostring(math.floor(distance))
 	end
 end
