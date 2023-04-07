@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.8.5'
+local ver = 'v0.9.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1092,6 +1092,36 @@ local function updateMessages()
 	end
 end
 
+local function updateDistances()
+	for index,value in pairs(activeMessages) do
+		local myCharacter = localPlayer.Character
+		if not myCharacter then
+			activeMessages[index].Distance = "N/A"
+			return
+		end
+		local myRootPart = myCharacter:WaitForChild("HumanoidRootPart", math.huge)
+		if not myRootPart then
+			activeMessages[index].Distance = "N/A"
+			return
+		end
+		
+		local player = value.Player
+		local character = player.Character
+		if not character then
+			activeMessages[index].Distance = "N/A"
+			return
+		end
+		local rootPart = character:WaitForChild("HumanoidRootPart", math.huge)
+		if not rootPart then
+			activeMessages[index].Distance = "N/A"
+			return
+		end
+		
+		local distance = (myRootPart.Position-rootPart.Position).Magnitude
+		activeMessages[index].Distance = tostring(distance)
+	end
+end
+
 local function clearOldSound(sound)
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	tweenService:Create(sound, tweenInfo, {Volume = 0}):Play()
@@ -1315,7 +1345,8 @@ local function chatted(player, msg)
 				return
 			end
 			
-			local name = "["..player.Name.."]["..characterName.."]: "
+			local distance = activeMessages[player.UserId].Distance
+			local name = "["..player.Name.."]["..characterName.."]["..distance.."]: "
 			local text = instance.text.label2.Text
 			
 			local minlen = 3
@@ -1350,7 +1381,8 @@ local function playerAdded(player)
 		Instances = {},
 		OldInstances = {},
 		NameColor = getNameColor(player),
-		ChatColor = getChatColor(player)
+		ChatColor = getChatColor(player),
+		Distance = "N/A"
 	}
 	activeMessages[player.UserId] = newPlayer
 	
@@ -1387,5 +1419,6 @@ shared.CV_RenderSteppedCon = runService.RenderStepped:Connect(function(deltaTime
 		
 		task.spawn(updateMessages)
 		task.spawn(updateAmbient)
+		task.spawn(updateDistances)
 	end
 end)
