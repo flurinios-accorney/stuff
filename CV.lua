@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.9.3'
+local ver = 'v0.10.0'
 
 local messageCache = {}
 local activeMessages = {}
@@ -212,9 +212,11 @@ local ambients = {
 		ambient = {}
 	},
 	chaser = {
-		ambient = {},
+		ambient = {
+			volume = 1
+		},
 		combat = {
-			volume = 0.6
+			volume = 1
 		}
 	},
 	hive = {
@@ -1155,6 +1157,15 @@ local function updateAmbient()
 			end
 		end
 	end
+	local chaserHealth, chaserMaxHealth
+	if area.name == "chaser" then
+		for i,c in pairs(workspace:WaitForChild("Live", math.huge):GetChildren()) do
+			if c:FindFirstChild("ChaserController") then
+				chaserHealth = c:WaitForChild("Humanoid", math.huge).Health
+				chaserMaxHealth = c:WaitForChild("Humanoid", math.huge).MaxHealth
+			end
+		end
+	end
 	
 	-- new
 	if not combat or combat.SoundId ~= area.combat.id and isCombat then
@@ -1203,8 +1214,36 @@ local function updateAmbient()
 		special = newSpecial
 	end
 	
+	local function isFerryman()
+		if ferrymanHealth then
+			if ferrymanHealth <= (ferrymanMaxHealth / 2) then
+				return true, 2
+			end
+			return true, 1
+		end
+		return false, nil
+	end
+	local function isChaser()
+		if chaserHealth then
+			if chaserHealth <= (chaserMaxHealth * 0.8) then
+				return true, 2
+			end
+			return true, 1
+		end
+		return false, nil
+	end
+	
 	local function shouldPlayCombat()
-		if isCombat and combat.SoundId ~= ambient.SoundId and not ferrymanHealth or ferrymanHealth and ferrymanHealth <= (ferrymanMaxHealth / 2) then
+		local ferryman, stageFerryman = isFerryman()
+		local chaser, stageChaser = isChaser()
+		
+		if ferryman and stageFerryman == 2 then
+			return true
+		end
+		if chaser and stageChaser == 2 then
+			return true
+		end
+		if isCombat and combat.SoundId ~= ambient.SoundId and not ferryman and not chaser then
 			return true
 		end
 		return false
