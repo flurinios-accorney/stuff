@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.10.1'
+local ver = 'v0.10.2'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1118,6 +1118,7 @@ local function clearOldSound(sound)
 	debris:AddItem(sound, 1)
 end
 
+local chaserStage2Triggered = false
 local function updateAmbient()
 	local area = getAmbient()
 	if not area then
@@ -1225,11 +1226,16 @@ local function updateAmbient()
 	end
 	local function isChaser()
 		if chaserHealth then
+			if chaserStage2Triggered then
+				return true, 2
+			end
 			if chaserHealth <= (chaserMaxHealth * 0.8) then
+				chaserStage2Triggered = true
 				return true, 2
 			end
 			return true, 1
 		end
+		chaserStage2Triggered = false
 		return false, nil
 	end
 	
