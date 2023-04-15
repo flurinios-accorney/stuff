@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.10.0'
+local ver = 'v0.10.1'
 
 local messageCache = {}
 local activeMessages = {}
@@ -216,7 +216,7 @@ local ambients = {
 			volume = 1
 		},
 		combat = {
-			volume = 1
+			volume = 0.7
 		}
 	},
 	hive = {
