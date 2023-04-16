@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.10.4'
+local ver = 'v0.10.5'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1229,7 +1229,7 @@ local function updateAmbient()
 			if chaserStage2Triggered then
 				return true, 2
 			end
-			if chaserHealth <= (chaserMaxHealth * 0.8) - 1600 then
+			if chaserHealth <= (chaserMaxHealth * 0.8) then
 				chaserStage2Triggered = true
 				return true, 2
 			end
