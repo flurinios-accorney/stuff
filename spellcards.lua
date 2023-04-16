@@ -75,7 +75,11 @@ shared.SC_UI = screenGui
 local function newSpellSign(text, element)
 	local mainFrame = Instance.new("Frame")
 	local line = Instance.new("Frame")
+	local line2 = Instance.new("Frame")
+	local line3 = Instance.new("Frame")
 	local gradient = Instance.new("UIGradient")
+	local gradient2
+	local gradient3
 	local imageLabel = Instance.new("ImageLabel")
 	local imageLabel2 = Instance.new("ImageLabel")
 	local textLabel = Instance.new("TextLabel")
@@ -86,7 +90,7 @@ local function newSpellSign(text, element)
 	mainFrame.AnchorPoint = Vector2.new(1,0)
 	mainFrame.Position = UDim2.new(0.55, 0, 0.7, 0) -- mid pos UDim2.new(0.95, 0, 0.7, 0), final pos UDim2.new(0.95, 0, 0.15, 0)
 	mainFrame.Size = UDim2.new(0, 500, 0, 50)
-	
+
 	scale.Parent = mainFrame
 	scale.Scale = 1.7
 
@@ -94,6 +98,18 @@ local function newSpellSign(text, element)
 	line.BorderSizePixel = 0
 	line.Position = UDim2.new(0, 0, 1, 0)
 	line.Size = UDim2.new(1, 0, 0, -4)
+	
+	line2.Parent = line
+	line2.BackgroundTransparency = 0.5
+	line2.BorderSizePixel = 0
+	line2.Position = UDim2.new(0, 20, 1, 4)
+	line2.Size = UDim2.new(1, -40, 0, -3)
+	
+	line3.Parent = line2
+	line3.BackgroundTransparency = 0.8
+	line3.BorderSizePixel = 0
+	line3.Position = UDim2.new(0, 40, 1, 3)
+	line3.Size = UDim2.new(1, -80, 0, -2)
 
 	gradient.Parent = line
 	gradient.Color = ColorSequence.new{
@@ -111,6 +127,12 @@ local function newSpellSign(text, element)
 		NumberSequenceKeypoint.new(0.707, 0.525),
 		NumberSequenceKeypoint.new(1, 1)
 	}
+	
+	gradient2 = gradient:Clone()
+	gradient2.Parent = line2
+	
+	gradient3 = gradient:Clone()
+	gradient3.Parent = line3
 
 	imageLabel.Parent = mainFrame
 	imageLabel.BackgroundTransparency = 1
@@ -121,11 +143,11 @@ local function newSpellSign(text, element)
 	imageLabel.ImageTransparency = 0.2
 	imageLabel.ScaleType = Enum.ScaleType.Crop
 	imageLabel.ZIndex = 2
-	
+
 	imageLabel2.Parent = mainFrame
 	imageLabel2.BackgroundTransparency = 1
-	imageLabel2.Position = UDim2.new(0, -100, 1, -75)
-	imageLabel2.Size = UDim2.new(0, 110, 0, 110)
+	imageLabel2.Position = UDim2.new(0, -115, 1, -90)
+	imageLabel2.Size = UDim2.new(0, 140, 0, 140)
 	imageLabel2.Image = "rbxassetid://5304862649"
 	imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
 	imageLabel2.ImageTransparency = .5
@@ -148,6 +170,8 @@ local function newSpellSign(text, element)
 		mainFrame = mainFrame,
 		textLabel = textLabel,
 		line = line,
+		line2 = line2,
+		line3 = line3,
 		imageLabel = imageLabel,
 		imageLabel2 = imageLabel2,
 		scale = scale
@@ -161,12 +185,12 @@ local function newMove(move)
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type)
 	lastSpell = ui
-	
+
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	
+
 	local tweenInfoImageColor = TweenInfo.new(.6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	
+
 	local tweenInfoMid = TweenInfo.new(.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoFinal = TweenInfo.new(.35, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoExit = TweenInfo.new(1.4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
@@ -198,22 +222,22 @@ local function newMove(move)
 				task.wait()
 			end
 		elseif move.Type == "Tacet" then
-			local tweenInfoMurmur = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+			local tweenInfoMurmur = TweenInfo.new(.3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 			while not fadeTweenPlaying and ui.imageLabel2 do
-				local transparency = ui.imageLabel2.ImageTransparency == 0 and .95 or 0
+				local transparency = ui.imageLabel2.ImageTransparency == 0.5 and .95 or 0.5
 				local murmurTween = tweenService:Create(ui.imageLabel2, tweenInfoMurmur, {ImageTransparency = transparency})
 				murmurTween:Play()
 				task.wait(.4)
 			end
 		end
 	end)
-	
+
 	local scaleTween = tweenService:Create(ui.scale, tweenInfoScale, {Scale = 1})
 	local scaleExitTween = tweenService:Create(ui.scale, tweenInfoScaleExit, {Scale = 1.2})
-	
+
 	local imageColorTween = tweenService:Create(ui.imageLabel, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
 	local image2ColorTween = tweenService:Create(ui.imageLabel2, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
-	
+
 	local midTween = tweenService:Create(ui.mainFrame, tweenInfoMid, {Position = UDim2.new(0.95, 0, 0.7, 0)})
 	local finalTween = tweenService:Create(ui.mainFrame, tweenInfoFinal, {Position = UDim2.new(0.95, 0, 0.15, 0)})
 	local exitTween = tweenService:Create(ui.mainFrame, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
@@ -222,6 +246,8 @@ local function newMove(move)
 	local fadeTweenImage2 = tweenService:Create(ui.imageLabel2, tweenInfoFade, {ImageTransparency = 1})
 	local fadeTweenText = tweenService:Create(ui.textLabel, tweenInfoFade, {TextTransparency = 1, TextStrokeTransparency = 1})
 	local fadeTweenLine = tweenService:Create(ui.line, tweenInfoFade, {BackgroundTransparency = 1})
+	local fadeTweenLine2 = tweenService:Create(ui.line2, tweenInfoFade, {BackgroundTransparency = 1})
+	local fadeTweenLine3 = tweenService:Create(ui.line3, tweenInfoFade, {BackgroundTransparency = 1})
 
 	midTween.Completed:Connect(function(playbackState)
 		task.wait(.05)
@@ -231,7 +257,7 @@ local function newMove(move)
 		task.wait(.1)
 		ui.mainFrame:Destroy()
 	end)
-	
+
 	midTween:Play()
 	scaleTween:Play()
 
@@ -244,6 +270,8 @@ local function newMove(move)
 	fadeTweenImage2:Play()
 	fadeTweenText:Play()
 	fadeTweenLine:Play()
+	fadeTweenLine2:Play()
+	fadeTweenLine3:Play()
 	exitTween:Play()
 end
 
