@@ -190,7 +190,7 @@ local function newSpellSign(text, element)
 	end
 	
 	local clone = cachedUI:Clone()
-	clone.ImageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
+	clone.imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
 	clone.textLabel.Text = '<i>'..text..'</i>'
 
 	return {
