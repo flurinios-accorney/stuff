@@ -87,6 +87,7 @@ local function cacheUI()
 	local textLabel = Instance.new("TextLabel")
 	local scale = Instance.new("UIScale")
 
+	mainFrame.Name = "mainFrame"
 	mainFrame.Visible = false
 	mainFrame.Parent = screenGui
 	mainFrame.BackgroundTransparency = 1
@@ -94,26 +95,31 @@ local function cacheUI()
 	mainFrame.Position = UDim2.new(0.55, 0, 0.7, 0) -- mid pos UDim2.new(0.95, 0, 0.7, 0), final pos UDim2.new(0.95, 0, 0.15, 0)
 	mainFrame.Size = UDim2.new(0, 500, 0, 50)
 
+	scale.Name = "scale"
 	scale.Parent = mainFrame
 	scale.Scale = 1.7
 
+	line.Name = "line"
 	line.Parent = mainFrame
 	line.BorderSizePixel = 0
 	line.Position = UDim2.new(0, 0, 1, 0)
 	line.Size = UDim2.new(1, 0, 0, -4)
 	
+	line2.Name = "line2"
 	line2.Parent = line
 	line2.BackgroundTransparency = 0.5
 	line2.BorderSizePixel = 0
 	line2.Position = UDim2.new(0, 20, 1, 4)
 	line2.Size = UDim2.new(1, -40, 0, -3)
 	
+	line3.Name = "line3"
 	line3.Parent = line2
 	line3.BackgroundTransparency = 0.8
 	line3.BorderSizePixel = 0
 	line3.Position = UDim2.new(0, 40, 1, 3)
 	line3.Size = UDim2.new(1, -80, 0, -2)
 
+	gradient.Name = "gradient"
 	gradient.Parent = line
 	gradient.Color = ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
@@ -131,12 +137,15 @@ local function cacheUI()
 		NumberSequenceKeypoint.new(1, 1)
 	}
 	
+	gradient2.Name = "gradient2"
 	gradient2 = gradient:Clone()
 	gradient2.Parent = line2
 	
+	gradient3.Name = "gradient3"
 	gradient3 = gradient:Clone()
 	gradient3.Parent = line3
 
+	imageLabel.Name = "imageLabel"
 	imageLabel.Parent = mainFrame
 	imageLabel.BackgroundTransparency = 1
 	imageLabel.Position = UDim2.new(0, -85, 1, -60)
@@ -147,6 +156,7 @@ local function cacheUI()
 	imageLabel.ScaleType = Enum.ScaleType.Crop
 	imageLabel.ZIndex = 2
 
+	imageLabel2.Name = "imageLabel2"
 	imageLabel2.Parent = mainFrame
 	imageLabel2.BackgroundTransparency = 1
 	imageLabel2.Position = UDim2.new(0, -115, 1, -90)
@@ -156,6 +166,7 @@ local function cacheUI()
 	imageLabel2.ImageTransparency = .5
 	imageLabel2.ScaleType = Enum.ScaleType.Crop
 
+	textLabel.Name = "textLabel"
 	textLabel.Parent = mainFrame
 	textLabel.BackgroundTransparency = 1
 	textLabel.Position = UDim2.new(0, 20, 0, 0)
@@ -179,17 +190,17 @@ local function newSpellSign(text, element)
 	end
 	
 	local clone = cachedUI:Clone()
-	clone.imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
+	clone.ImageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
 	clone.textLabel.Text = '<i>'..text..'</i>'
 
 	return {
 		mainFrame = clone.mainFrame,
 		textLabel = clone.textLabel,
 		line = clone.line,
-		line2 = clone.line2,
-		line3 = clone.line3,
+		line2 = clone.line.line2,
+		line3 = clone.line.line2.line3,
 		imageLabel = clone.imageLabel,
-		imageLabel2 = clone.imageLabel2,
+		imageLabel2 = clone.ImageLabel2,
 		scale = clone.scale
 	}
 end
