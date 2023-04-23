@@ -39,7 +39,7 @@ while not character do
 end
 local backpack = player:WaitForChild("Backpack", math.huge) or player.Backpack:Wait()
 
-local lastSpell = {}
+local lastSpell
 local registered = {}
 
 local elementColors = {
@@ -72,7 +72,7 @@ screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 shared.SC_UI = screenGui
 
-local cachedUI = {}
+local cachedUI
 
 local function cacheUI()
 	local mainFrame = Instance.new("Frame")
@@ -94,7 +94,7 @@ local function cacheUI()
 	mainFrame.Position = UDim2.new(0.55, 0, 0.7, 0) -- mid pos UDim2.new(0.95, 0, 0.7, 0), final pos UDim2.new(0.95, 0, 0.15, 0)
 	mainFrame.Size = UDim2.new(0, 500, 0, 50)
 
-	scale.Name = "Scale"
+	scale.Name = "UIScale"
 	scale.Parent = mainFrame
 	scale.Scale = 1.7
 
@@ -176,25 +176,16 @@ local function cacheUI()
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextYAlignment = Enum.TextYAlignment.Bottom
 	
-	cachedUI = {
-		mainFrame = mainFrame,
-		textLabel = textLabel,
-		line = line,
-		line2 = line2,
-		line3 = line3,
-		imageLabel = imageLabel,
-		imageLabel2 = imageLabel2,
-		scale = scale
-	}
+	cachedUI = mainFrame
 end
 
 
 local function newSpellSign(text, element)
-	if not cachedUI.mainFrame then
+	if not cachedUI then
 		cacheUI()
 	end
 
-	local clone = cachedUI.mainFrame:Clone()
+	local clone = cachedUI:Clone()
 	local copy = {
 		mainFrame = clone,
 		textLabel = clone.TextLabel,
@@ -203,9 +194,9 @@ local function newSpellSign(text, element)
 		line3 = clone.Line.Line2.Line3,
 		imageLabel = clone.ImageLabel,
 		imageLabel2 = clone.ImageLabel2,
-		scale = clone.Scale
+		scale = clone.UIScale
 	}
-	
+
 	copy.imageLabel2.ImageColor3 = elementColors[element] and elementColors[element] or Color3.fromRGB(255,255,255)
 	copy.textLabel.Text = '<i>'..text..'</i>'
 	copy.mainFrame.Visible = true
@@ -213,7 +204,7 @@ local function newSpellSign(text, element)
 end
 
 local function newMove(move)
-	if lastSpell.mainFrame then
+	if lastSpell then
 		lastSpell.mainFrame:Destroy()
 	end
 
