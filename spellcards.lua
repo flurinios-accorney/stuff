@@ -188,7 +188,7 @@ local function newSpellSign(text, element)
 	if not cachedUI then
 		cacheUI()
 	end
-	
+
 	local clone = cachedUI:Clone()
 	clone.imageLabel2.ImageColor3 = elementColors[element] and elementColors[element] or Color3.fromRGB(255,255,255)
 	clone.textLabel.Text = '<i>'..text..'</i>'
@@ -207,12 +207,12 @@ end
 
 local function newMove(move)
 	if lastSpell then
-		lastSpell.mainFrame:Destroy()
+		lastSpell:Destroy()
 	end
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type)
 	lastSpell = ui
-	ui.mainFrame.Visible = true
+	ui.Visible = true
 
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
@@ -268,9 +268,9 @@ local function newMove(move)
 	local imageColorTween = tweenService:Create(ui.imageLabel, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
 	local image2ColorTween = tweenService:Create(ui.imageLabel2, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
 
-	local midTween = tweenService:Create(ui.mainFrame, tweenInfoMid, {Position = UDim2.new(0.95, 0, 0.7, 0)})
-	local finalTween = tweenService:Create(ui.mainFrame, tweenInfoFinal, {Position = UDim2.new(0.95, 0, 0.15, 0)})
-	local exitTween = tweenService:Create(ui.mainFrame, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
+	local midTween = tweenService:Create(ui, tweenInfoMid, {Position = UDim2.new(0.95, 0, 0.7, 0)})
+	local finalTween = tweenService:Create(ui, tweenInfoFinal, {Position = UDim2.new(0.95, 0, 0.15, 0)})
+	local exitTween = tweenService:Create(ui, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
 
 	local fadeTweenImage = tweenService:Create(ui.imageLabel, tweenInfoFade, {ImageTransparency = 1})
 	local fadeTweenImage2 = tweenService:Create(ui.imageLabel2, tweenInfoFade, {ImageTransparency = 1})
@@ -285,7 +285,7 @@ local function newMove(move)
 	end)
 	fadeTweenLine.Completed:Connect(function(playbackState)
 		task.wait(.1)
-		ui.mainFrame:Destroy()
+		ui:Destroy()
 	end)
 
 	-- spawn in
