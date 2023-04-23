@@ -26,7 +26,7 @@ local localPlayer = players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui", math.huge)
 
 -- vars
-local ver = 'v0.11.0'
+local ver = 'v0.11.1'
 
 local messageCache = {}
 local activeMessages = {}
@@ -1073,17 +1073,8 @@ local function updateOldInstance(player, guid, instance)
 	local posName = Vector2.new(Xname, Y)
 	local posMsg = Vector2.new(Xmsg, Y)
 	
-	local tweenInfoPos = TweenInfo.new(.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-	local pos1Tween = tweenService:Create(activeMessages[player.UserId].OldInstances[guid].text.label1, tweenInfoPos, {Position = posName})
-	local pos2Tween = tweenService:Create(activeMessages[player.UserId].OldInstances[guid].text.label2, tweenInfoPos, {Position = posMsg})
-	
-	if activeMessages[player.UserId].OldInstances[guid].text.label1.Position.X ~= Xname then
-		activeMessages[player.UserId].OldInstances[guid].text.label1.Position = posName
-		activeMessages[player.UserId].OldInstances[guid].text.label2.Position = posMsg
-	else
-		pos1Tween:Play()
-		pos2Tween:Play()
-	end
+	activeMessages[player.UserId].OldInstances[guid].text.label1.Position = posName
+	activeMessages[player.UserId].OldInstances[guid].text.label2.Position = posMsg
 	activeMessages[player.UserId].OldInstances[guid].text.label1.Visible = true
 	activeMessages[player.UserId].OldInstances[guid].text.label2.Visible = true
 end
