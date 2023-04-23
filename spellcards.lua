@@ -41,6 +41,7 @@ local backpack = player:WaitForChild("Backpack", math.huge) or player.Backpack:W
 
 local lastSpell
 local registered = {}
+
 local elementColors = {
 	Wind = Color3.fromRGB(0,255,0),
 	Ice = Color3.fromRGB(0,255,255),
@@ -71,8 +72,9 @@ screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 shared.SC_UI = screenGui
 
+local cachedUI
 
-local function newSpellSign(text, element)
+local function cacheUI()
 	local mainFrame = Instance.new("Frame")
 	local line = Instance.new("Frame")
 	local line2 = Instance.new("Frame")
@@ -85,6 +87,7 @@ local function newSpellSign(text, element)
 	local textLabel = Instance.new("TextLabel")
 	local scale = Instance.new("UIScale")
 
+	mainFrame.Visible = false
 	mainFrame.Parent = screenGui
 	mainFrame.BackgroundTransparency = 1
 	mainFrame.AnchorPoint = Vector2.new(1,0)
@@ -149,7 +152,7 @@ local function newSpellSign(text, element)
 	imageLabel2.Position = UDim2.new(0, -115, 1, -90)
 	imageLabel2.Size = UDim2.new(0, 140, 0, 140)
 	imageLabel2.Image = "rbxassetid://5304862649"
-	imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
+	imageLabel2.ImageColor3 = Color3.fromRGB(255,255,255)
 	imageLabel2.ImageTransparency = .5
 	imageLabel2.ScaleType = Enum.ScaleType.Crop
 
@@ -159,22 +162,35 @@ local function newSpellSign(text, element)
 	textLabel.Size = UDim2.new(1, -20, 1, -4)
 	textLabel.RichText = true
 	textLabel.Font = Enum.Font.SpecialElite
-	textLabel.Text = '<i>'..text..'</i>'
+	textLabel.Text = '<i>'..''..'</i>'
 	textLabel.TextColor3 = Color3.fromRGB(255,255,255)
 	textLabel.TextSize = 28
 	textLabel.TextStrokeTransparency = 0
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextYAlignment = Enum.TextYAlignment.Bottom
+	
+	cachedUI = mainFrame
+end
+
+
+local function newSpellSign(text, element)
+	if not cachedUI then
+		cacheUI()
+	end
+	
+	local clone = cachedUI:Clone()
+	clone.imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
+	clone.textLabel.Text = '<i>'..text..'</i>'
 
 	return {
-		mainFrame = mainFrame,
-		textLabel = textLabel,
-		line = line,
-		line2 = line2,
-		line3 = line3,
-		imageLabel = imageLabel,
-		imageLabel2 = imageLabel2,
-		scale = scale
+		mainFrame = clone.mainFrame,
+		textLabel = clone.textLabel,
+		line = clone.line,
+		line2 = clone.line2,
+		line3 = clone.line3,
+		imageLabel = clone.imageLabel,
+		imageLabel2 = clone.imageLabel2,
+		scale = clone.scale
 	}
 end
 
@@ -185,6 +201,7 @@ local function newMove(move)
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type)
 	lastSpell = ui
+	ui.mainFrame.Visible = true
 
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
@@ -199,6 +216,7 @@ local function newMove(move)
 
 	local fadeTweenPlaying = false
 
+	-- spin
 	task.spawn(function()
 		local tweenInfoSpin = TweenInfo.new(.25, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 		while ui.imageLabel and ui.imageLabel2 do
@@ -209,6 +227,7 @@ local function newMove(move)
 			task.wait(.23)
 		end
 	end)
+	-- special types
 	task.spawn(function()
 		if move.Type == "Radiant" then
 			local t = .6
@@ -224,7 +243,7 @@ local function newMove(move)
 		elseif move.Type == "Tacet" then
 			local tweenInfoMurmur = TweenInfo.new(.3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 			while not fadeTweenPlaying and ui.imageLabel2 do
-				local transparency = ui.imageLabel2.ImageTransparency == 0.5 and .95 or 0.5
+				local transparency = ui.imageLabel2.ImageTransparency == 0.5 and .98 or 0.5
 				local murmurTween = tweenService:Create(ui.imageLabel2, tweenInfoMurmur, {ImageTransparency = transparency})
 				murmurTween:Play()
 				task.wait(.4)
@@ -258,10 +277,12 @@ local function newMove(move)
 		ui.mainFrame:Destroy()
 	end)
 
+	-- spawn in
 	midTween:Play()
 	scaleTween:Play()
 
 	task.wait(3)
+	-- fade out
 	fadeTweenPlaying = true
 	scaleExitTween:Play()
 	imageColorTween:Play()
