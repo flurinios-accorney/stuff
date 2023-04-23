@@ -39,7 +39,7 @@ while not character do
 end
 local backpack = player:WaitForChild("Backpack", math.huge) or player.Backpack:Wait()
 
-local lastSpell
+local lastSpell = {}
 local registered = {}
 
 local elementColors = {
@@ -72,7 +72,7 @@ screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 shared.SC_UI = screenGui
 
-local cachedUI
+local cachedUI = {}
 
 local function cacheUI()
 	local mainFrame = Instance.new("Frame")
@@ -87,7 +87,6 @@ local function cacheUI()
 	local textLabel = Instance.new("TextLabel")
 	local scale = Instance.new("UIScale")
 
-	mainFrame.Name = "mainFrame"
 	mainFrame.Visible = false
 	mainFrame.Parent = screenGui
 	mainFrame.BackgroundTransparency = 1
@@ -95,31 +94,30 @@ local function cacheUI()
 	mainFrame.Position = UDim2.new(0.55, 0, 0.7, 0) -- mid pos UDim2.new(0.95, 0, 0.7, 0), final pos UDim2.new(0.95, 0, 0.15, 0)
 	mainFrame.Size = UDim2.new(0, 500, 0, 50)
 
-	scale.Name = "scale"
+	scale.Name = "Scale"
 	scale.Parent = mainFrame
 	scale.Scale = 1.7
 
-	line.Name = "line"
+	line.Name = "Line"
 	line.Parent = mainFrame
 	line.BorderSizePixel = 0
 	line.Position = UDim2.new(0, 0, 1, 0)
 	line.Size = UDim2.new(1, 0, 0, -4)
 	
-	line2.Name = "line2"
+	line2.Name = "Line2"
 	line2.Parent = line
 	line2.BackgroundTransparency = 0.5
 	line2.BorderSizePixel = 0
 	line2.Position = UDim2.new(0, 20, 1, 4)
 	line2.Size = UDim2.new(1, -40, 0, -3)
 	
-	line3.Name = "line3"
+	line3.Name = "Line3"
 	line3.Parent = line2
 	line3.BackgroundTransparency = 0.8
 	line3.BorderSizePixel = 0
 	line3.Position = UDim2.new(0, 40, 1, 3)
 	line3.Size = UDim2.new(1, -80, 0, -2)
 
-	gradient.Name = "gradient"
 	gradient.Parent = line
 	gradient.Color = ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
@@ -138,14 +136,12 @@ local function cacheUI()
 	}
 	
 	gradient2 = gradient:Clone()
-	gradient2.Name = "gradient2"
 	gradient2.Parent = line2
 	
 	gradient3 = gradient:Clone()
-	gradient3.Name = "gradient3"
 	gradient3.Parent = line3
 
-	imageLabel.Name = "imageLabel"
+	imageLabel.Name = "ImageLabel"
 	imageLabel.Parent = mainFrame
 	imageLabel.BackgroundTransparency = 1
 	imageLabel.Position = UDim2.new(0, -85, 1, -60)
@@ -156,7 +152,7 @@ local function cacheUI()
 	imageLabel.ScaleType = Enum.ScaleType.Crop
 	imageLabel.ZIndex = 2
 
-	imageLabel2.Name = "imageLabel2"
+	imageLabel2.Name = "ImageLabel2"
 	imageLabel2.Parent = mainFrame
 	imageLabel2.BackgroundTransparency = 1
 	imageLabel2.Position = UDim2.new(0, -115, 1, -90)
@@ -166,7 +162,7 @@ local function cacheUI()
 	imageLabel2.ImageTransparency = .5
 	imageLabel2.ScaleType = Enum.ScaleType.Crop
 
-	textLabel.Name = "textLabel"
+	textLabel.Name = "TextLabel"
 	textLabel.Parent = mainFrame
 	textLabel.BackgroundTransparency = 1
 	textLabel.Position = UDim2.new(0, 20, 0, 0)
@@ -180,39 +176,49 @@ local function cacheUI()
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextYAlignment = Enum.TextYAlignment.Bottom
 	
-	cachedUI = mainFrame
+	cachedUI = {
+		mainFrame = mainFrame,
+		textLabel = textLabel,
+		line = line,
+		line2 = line2,
+		line3 = line3,
+		imageLabel = imageLabel,
+		imageLabel2 = imageLabel2,
+		scale = scale
+	}
 end
 
 
 local function newSpellSign(text, element)
-	if not cachedUI then
+	if not cachedUI.mainFrame then
 		cacheUI()
 	end
 
-	local clone = cachedUI:Clone()
-	clone.imageLabel2.ImageColor3 = elementColors[element] and elementColors[element] or Color3.fromRGB(255,255,255)
-	clone.textLabel.Text = '<i>'..text..'</i>'
-
-	return {
+	local clone = cachedUI.mainFrame:Clone()
+	local copy = {
 		mainFrame = clone,
-		textLabel = clone.textLabel,
-		line = clone.line,
-		line2 = clone.line.line2,
-		line3 = clone.line.line2.line3,
-		imageLabel = clone.imageLabel,
-		imageLabel2 = clone.imageLabel2,
-		scale = clone.scale
+		textLabel = clone.TextLabel,
+		line = clone.Line,
+		line2 = clone.Line.Line2,
+		line3 = clone.Line.Line2.Line3,
+		imageLabel = clone.ImageLabel,
+		imageLabel2 = clone.ImageLabel2,
+		scale = clone.Scale
 	}
+	
+	copy.imageLabel2.ImageColor3 = elementColors[element] and elementColors[element] or Color3.fromRGB(255,255,255)
+	copy.textLabel.Text = '<i>'..text..'</i>'
+	copy.mainFrame.Visible = true
+	return copy
 end
 
 local function newMove(move)
-	if lastSpell then
-		lastSpell:Destroy()
+	if lastSpell.mainFrame then
+		lastSpell.mainFrame:Destroy()
 	end
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type)
 	lastSpell = ui
-	ui.Visible = true
 
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
@@ -268,9 +274,9 @@ local function newMove(move)
 	local imageColorTween = tweenService:Create(ui.imageLabel, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
 	local image2ColorTween = tweenService:Create(ui.imageLabel2, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
 
-	local midTween = tweenService:Create(ui, tweenInfoMid, {Position = UDim2.new(0.95, 0, 0.7, 0)})
-	local finalTween = tweenService:Create(ui, tweenInfoFinal, {Position = UDim2.new(0.95, 0, 0.15, 0)})
-	local exitTween = tweenService:Create(ui, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
+	local midTween = tweenService:Create(ui.mainFrame, tweenInfoMid, {Position = UDim2.new(0.95, 0, 0.7, 0)})
+	local finalTween = tweenService:Create(ui.mainFrame, tweenInfoFinal, {Position = UDim2.new(0.95, 0, 0.15, 0)})
+	local exitTween = tweenService:Create(ui.mainFrame, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
 
 	local fadeTweenImage = tweenService:Create(ui.imageLabel, tweenInfoFade, {ImageTransparency = 1})
 	local fadeTweenImage2 = tweenService:Create(ui.imageLabel2, tweenInfoFade, {ImageTransparency = 1})
@@ -285,7 +291,7 @@ local function newMove(move)
 	end)
 	fadeTweenLine.Completed:Connect(function(playbackState)
 		task.wait(.1)
-		ui:Destroy()
+		ui.mainFrame:Destroy()
 	end)
 
 	-- spawn in
