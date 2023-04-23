@@ -194,7 +194,7 @@ local function newSpellSign(text, element)
 	clone.textLabel.Text = '<i>'..text..'</i>'
 
 	return {
-		mainFrame = clone.mainFrame,
+		mainFrame = clone,
 		textLabel = clone.textLabel,
 		line = clone.line,
 		line2 = clone.line.line2,
