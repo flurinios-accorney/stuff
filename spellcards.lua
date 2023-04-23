@@ -137,12 +137,12 @@ local function cacheUI()
 		NumberSequenceKeypoint.new(1, 1)
 	}
 	
-	gradient2.Name = "gradient2"
 	gradient2 = gradient:Clone()
+	gradient2.Name = "gradient2"
 	gradient2.Parent = line2
 	
-	gradient3.Name = "gradient3"
 	gradient3 = gradient:Clone()
+	gradient3.Name = "gradient3"
 	gradient3.Parent = line3
 
 	imageLabel.Name = "imageLabel"
