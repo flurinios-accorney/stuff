@@ -202,7 +202,7 @@ local function newMove(move)
 
 	-- spin
 	task.spawn(function()
-		local increment = 20
+		local increment = 100
 		local con
 		con = runService.Heartbeat:Connect(function(deltaTime)
 			if not ui.imageLabel or not ui.imageLabel2 then
