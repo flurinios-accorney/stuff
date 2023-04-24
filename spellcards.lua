@@ -26,6 +26,7 @@ end
 shared.SC_tools = {}
 
 -- services
+local runService = game:GetService("RunService")
 local coreGui = game:GetService("CoreGui")
 local tweenService = game:GetService("TweenService")
 local players = game:GetService("Players")
@@ -201,14 +202,17 @@ local function newMove(move)
 
 	-- spin
 	task.spawn(function()
-		local tweenInfoSpin = TweenInfo.new(.25, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-		while ui.imageLabel and ui.imageLabel2 do
-			local spinTween = tweenService:Create(ui.imageLabel, tweenInfoSpin, {Rotation = ui.imageLabel.Rotation + 20})
-			local spin2Tween = tweenService:Create(ui.imageLabel2, tweenInfoSpin, {Rotation = -ui.imageLabel.Rotation - 20})
-			spinTween:Play()
-			spin2Tween:Play()
-			task.wait(.23)
-		end
+		local increment = 20
+		local con
+		con = runService.Heartbeat:Connect(function(deltaTime)
+			if not ui.imageLabel or not ui.imageLabel2 then
+				con:Disconnect()
+				return
+			end
+			
+			ui.imageLabel.Rotation = ui.imageLabel.Rotation + increment * deltaTime
+			ui.imageLabel2.Rotation = -ui.imageLabel.Rotation - increment * deltaTime
+		end)
 	end)
 	-- special types
 	task.spawn(function()
