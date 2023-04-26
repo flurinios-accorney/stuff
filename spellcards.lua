@@ -332,7 +332,7 @@ local function newSpellSign(text, element, stars)
 	imageLabel2.Size = UDim2.new(0, 140, 0, 140)
 	imageLabel2.Image = "rbxassetid://5304862649"
 	imageLabel2.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
-	imageLabel2.ImageTransparency = stars > 1 and .5 or 1
+	imageLabel2.ImageTransparency = stars > 2 and .5 or 1
 	imageLabel2.ScaleType = Enum.ScaleType.Crop
 
 	imageLabel3.Parent = mainFrame
@@ -341,7 +341,7 @@ local function newSpellSign(text, element, stars)
 	imageLabel3.Size = UDim2.new(0, 200, 0, 200)
 	imageLabel3.Image = "rbxassetid://5304862649"
 	imageLabel3.ImageColor3 = elementColors[element] or Color3.fromRGB(255,255,255)
-	imageLabel3.ImageTransparency = stars > 2 and .8 or 1
+	imageLabel3.ImageTransparency = stars > 1 and .8 or 1
 	imageLabel3.ScaleType = Enum.ScaleType.Crop
 
 	textLabel.Parent = mainFrame
