@@ -237,6 +237,16 @@ local customTypes = {
 local customNames = {
 	["Tacet Drop Kick"] = {Type = "Tacet", Name = "Drop Kick"}
 }
+local touhouTypes = {
+	["Asteroid Belt"] = {Type = "Magic Space", Name = nil},
+	["Master Spark"] = {Type = "Love Sign", Name = "Master Spark Frozen"},
+	["Luminous Strike"] = {Type = "Light Sign", Name = nil},
+	["Stream Laser"] = {Type = "Light Sign", Name = nil},
+	["Stardust Reverie"] = {Type = "Magic Sign", Name = nil},
+	["Blazing Star"] = {Type = "Comet", Name = nil},
+	["Earthlight Ray"] = {Type = "Light Sign", Name = nil},
+	["Starlight Typhoon"] = {Type = "Love Storm", Name = nil}
+}
 
 -- ui
 local screenGui = Instance.new("ScreenGui")
@@ -514,6 +524,12 @@ local function checkTool(tool)
 				if customNames[tool:FindFirstChild("DefaultName").Value] then
 					Type = customNames[tool:FindFirstChild("DefaultName").Value].Type
 					final_str = customNames[tool:FindFirstChild("DefaultName").Value].Name
+					custom = true
+				end
+				if touhouTypes[final_str] then
+					Type = touhouTypes[final_str].Type
+					final_str = touhouTypes[final_str].Name and touhouTypes[final_str].Name or final_str
+					custom = true
 				end
 				
 				newMove({Type = Type, Name = final_str, Stars = stars, Custom = custom})
