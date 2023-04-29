@@ -381,9 +381,52 @@ local function newSpellSign(text, element, stars)
 	}
 end
 
+local function fadeOutLastMove(spell)
+	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local tweenInfoImageColor = TweenInfo.new(.6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local tweenInfoFade = TweenInfo.new(.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local tweenInfoExit = TweenInfo.new(1.4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	
+	local scaleExitTween = tweenService:Create(spell.scale, tweenInfoScaleExit, {Scale = 1.2})
+	local imageColorTween = tweenService:Create(spell.imageLabel, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
+	local image2ColorTween = tweenService:Create(spell.imageLabel2, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
+	local image3ColorTween = tweenService:Create(spell.imageLabel3, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
+	local fadeTweenImage = tweenService:Create(spell.imageLabel, tweenInfoFade, {ImageTransparency = 1})
+	local fadeTweenImage2 = tweenService:Create(spell.imageLabel2, tweenInfoFade, {ImageTransparency = 1})
+	local fadeTweenImage3 = tweenService:Create(spell.imageLabel3, tweenInfoFade, {ImageTransparency = 1})
+	local fadeTweenText = tweenService:Create(spell.textLabel, tweenInfoFade, {TextTransparency = 1, TextStrokeTransparency = 1})
+	local fadeTweenLine = tweenService:Create(spell.line, tweenInfoFade, {BackgroundTransparency = 1})
+	local fadeTweenLine2 = tweenService:Create(spell.line2, tweenInfoFade, {BackgroundTransparency = 1})
+	local fadeTweenLine3 = tweenService:Create(spell.line3, tweenInfoFade, {BackgroundTransparency = 1})
+	local exitTween = tweenService:Create(spell.mainFrame, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
+	
+	fadeTweenLine.Completed:Connect(function(playbackState)
+		task.wait(.1)
+		spell.mainFrame:Destroy()
+	end)
+	
+	scaleExitTween:Play()
+	
+	imageColorTween:Play()
+	image2ColorTween:Play()
+	image3ColorTween:Play()
+	
+	fadeTweenImage:Play()
+	fadeTweenImage2:Play()
+	fadeTweenImage3:Play()
+	
+	fadeTweenText:Play()
+	
+	fadeTweenLine:Play()
+	fadeTweenLine2:Play()
+	fadeTweenLine3:Play()
+	
+	exitTween:Play()
+end
+
 local function newMove(move)
 	if lastSpell then
-		lastSpell.mainFrame:Destroy()
+		task.spawn(fadeOutLastMove, lastSpell)
 	end
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type, move.Stars)
@@ -478,6 +521,10 @@ local function newMove(move)
 	scaleTween:Play()
 
 	task.wait(3)
+	if lastSpell ~= ui then
+		return
+	end
+	
 	-- fade out
 	fadeTweenPlaying = true
 	
