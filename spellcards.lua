@@ -264,6 +264,10 @@ local function newSpellSign(text, element, stars)
 	local gradient = Instance.new("UIGradient")
 	local gradient2
 	local gradient3
+	local gradientImage = Instance.new("UIGradient")
+	local gradientImage2
+	local gradientImage3
+	local gradientText = Instance.new("UIGradient")
 	local imageLabel = Instance.new("ImageLabel")
 	local imageLabel2 = Instance.new("ImageLabel")
 	local imageLabel3 = Instance.new("ImageLabel")
@@ -284,14 +288,14 @@ local function newSpellSign(text, element, stars)
 	line.Position = UDim2.new(0, 0, 1, 0)
 	line.Size = UDim2.new(1, 0, 0, -4)
 	line.ZIndex = 3
-	
+
 	line2.Parent = line
 	line2.BackgroundTransparency = 0.5
 	line2.BorderSizePixel = 0
 	line2.Position = UDim2.new(0, 20, 1, 4)
 	line2.Size = UDim2.new(1, -40, 0, -3)
 	line2.ZIndex = 3
-	
+
 	line3.Parent = line2
 	line3.BackgroundTransparency = 0.8
 	line3.BorderSizePixel = 0
@@ -315,12 +319,38 @@ local function newSpellSign(text, element, stars)
 		NumberSequenceKeypoint.new(0.707, 0.525),
 		NumberSequenceKeypoint.new(1, 1)
 	}
-	
+
 	gradient2 = gradient:Clone()
 	gradient2.Parent = line2
-	
+
 	gradient3 = gradient:Clone()
 	gradient3.Parent = line3
+	
+	gradientImage.Parent = imageLabel
+	gradientImage.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+		ColorSequenceKeypoint.new(0.0363, Color3.fromRGB(255, 51, 51)),
+		ColorSequenceKeypoint.new(0.138, Color3.fromRGB(255, 169, 169)),
+		ColorSequenceKeypoint.new(0.232, Color3.fromRGB(255, 208, 208)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+	}
+	gradientImage.Rotation = -90
+	
+	gradientImage2 = gradientImage:Clone()
+	gradientImage2.Parent = imageLabel2
+	
+	gradientImage3 = gradientImage:Clone()
+	gradientImage3.Parent = imageLabel3
+	
+	gradientText.Parent = textLabel
+	gradientText.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+		ColorSequenceKeypoint.new(0.0363, Color3.fromRGB(255, 83, 83)),
+		ColorSequenceKeypoint.new(0.138, Color3.fromRGB(255, 234, 234)),
+		ColorSequenceKeypoint.new(0.232, Color3.fromRGB(255, 215, 215)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+	}
+	gradientText.Rotation = -90
 
 	imageLabel.Parent = mainFrame
 	imageLabel.BackgroundTransparency = 1
@@ -377,7 +407,10 @@ local function newSpellSign(text, element, stars)
 		imageLabel = imageLabel,
 		imageLabel2 = imageLabel2,
 		imageLabel3 = imageLabel3,
-		scale = scale
+		scale = scale,
+		gradientImage = gradientImage,
+		gradientImage2 = gradientImage2,
+		gradientImage3 = gradientImage3
 	}
 end
 
@@ -386,7 +419,7 @@ local function fadeOutLastMove(spell)
 	local tweenInfoImageColor = TweenInfo.new(.6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoFade = TweenInfo.new(.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 	local tweenInfoExit = TweenInfo.new(1.4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-	
+
 	local scaleExitTween = tweenService:Create(spell.scale, tweenInfoScaleExit, {Scale = 1.2})
 	local imageColorTween = tweenService:Create(spell.imageLabel, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
 	local image2ColorTween = tweenService:Create(spell.imageLabel2, tweenInfoImageColor, {ImageColor3 = Color3.fromRGB(0,0,0)})
@@ -399,28 +432,28 @@ local function fadeOutLastMove(spell)
 	local fadeTweenLine2 = tweenService:Create(spell.line2, tweenInfoFade, {BackgroundTransparency = 1})
 	local fadeTweenLine3 = tweenService:Create(spell.line3, tweenInfoFade, {BackgroundTransparency = 1})
 	local exitTween = tweenService:Create(spell.mainFrame, tweenInfoExit, {Position = UDim2.new(0.95, 0, 0.2, 0)})
-	
+
 	fadeTweenLine.Completed:Connect(function(playbackState)
 		task.wait(.1)
 		spell.mainFrame:Destroy()
 	end)
-	
+
 	scaleExitTween:Play()
-	
+
 	imageColorTween:Play()
 	image2ColorTween:Play()
 	image3ColorTween:Play()
-	
+
 	fadeTweenImage:Play()
 	fadeTweenImage2:Play()
 	fadeTweenImage3:Play()
-	
+
 	fadeTweenText:Play()
-	
+
 	fadeTweenLine:Play()
 	fadeTweenLine2:Play()
 	fadeTweenLine3:Play()
-	
+
 	exitTween:Play()
 end
 
@@ -431,7 +464,7 @@ local function newMove(move)
 
 	local ui = newSpellSign(move.Custom and move.Type..' "'..move.Name..'"' or move.Type..' Sign "'..move.Name..'"', move.Type, move.Stars)
 	lastSpell = ui
-	
+
 	local tweenInfoScale = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 	local tweenInfoScaleExit = TweenInfo.new(1.8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 
@@ -454,10 +487,15 @@ local function newMove(move)
 				con:Disconnect()
 				return
 			end
-			
+
 			ui.imageLabel.Rotation = ui.imageLabel.Rotation + increment * deltaTime
+			ui.gradientImage.Rotation = -90 - ui.imageLabel.Rotation
+			
 			ui.imageLabel2.Rotation = -ui.imageLabel.Rotation - increment * deltaTime
+			ui.gradientImage2.Rotation = -90 - ui.imageLabel2.Rotation
+			
 			ui.imageLabel3.Rotation = ui.imageLabel.Rotation + increment * deltaTime
+			ui.gradientImage3.Rotation = -90 - ui.imageLabel3.Rotation
 		end)
 	end)
 	-- special types
@@ -524,26 +562,26 @@ local function newMove(move)
 	if lastSpell ~= ui then
 		return
 	end
-	
+
 	-- fade out
 	fadeTweenPlaying = true
-	
+
 	scaleExitTween:Play()
-	
+
 	imageColorTween:Play()
 	image2ColorTween:Play()
 	image3ColorTween:Play()
-	
+
 	fadeTweenImage:Play()
 	fadeTweenImage2:Play()
 	fadeTweenImage3:Play()
-	
+
 	fadeTweenText:Play()
-	
+
 	fadeTweenLine:Play()
 	fadeTweenLine2:Play()
 	fadeTweenLine3:Play()
-	
+
 	exitTween:Play()
 end
 
